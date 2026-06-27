@@ -278,19 +278,19 @@ main {
 /* Stretches to fill the remaining page height and distributes rows evenly */
 .questions-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 1fr;
-  gap: 3mm 5mm;
-  margin-top: 4mm;
+  gap: 4mm 8mm;
+  margin-top: 5mm;
   flex: 1;
   min-height: 0;
 }
 
 .question {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 2mm 4mm;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 2mm 3mm;
   font-size: 1rem;
   display: flex;
   align-items: stretch;
@@ -298,27 +298,27 @@ main {
 }
 
 .question-vertical {
-  gap: 0.4rem;
+  gap: 0.55rem;
 }
 
 .question-number {
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #4a5568;
   line-height: 1.2;
-  min-width: 1.4rem;
-  padding-top: 0.1rem;
+  min-width: 1.8rem;
+  padding-top: 0.25rem;
 }
 
 .question-stack {
   margin-left: auto;
-  min-width: 3.25rem;
+  min-width: 4.5rem;
   width: 100%;
-  max-width: 4.25rem;
+  max-width: 5.75rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  font-size: 1.05rem;
+  font-size: 1.45rem;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
@@ -332,25 +332,25 @@ main {
 
 .question-bottom {
   border-bottom: 2px solid #2b6cb0;
-  padding-bottom: 0.18rem;
+  padding-bottom: 0.28rem;
 }
 
 .question-operator {
   font-weight: 700;
-  margin-right: 0.35rem;
+  margin-right: 0.45rem;
 }
 
 .question-value,
 .question-top {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .answer-line {
   display: block;
   border-bottom: 2px solid #2b6cb0;
   width: 100%;
-  margin-top: 0.35rem;
-  min-height: 0.95rem;
+  margin-top: 0.45rem;
+  min-height: 1.25rem;
 }
 
 /* ---- Page Footer ---- */
