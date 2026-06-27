@@ -47,6 +47,22 @@ const MODULE_TOPICS = {
     { value: 'percentage-decrease', label: 'Percentage Decrease' },
     { value: 'percentage-to-decimal', label: 'Converting Percentage to Decimal' },
   ],
+  algebra: [
+    { value: 'patterns', label: 'Patterns' },
+    { value: 'variables', label: 'Variables' },
+    { value: 'expressions', label: 'Expressions' },
+    { value: 'substitution', label: 'Substitution' },
+    { value: 'expanding-expressions', label: 'Expanding Expressions' },
+    { value: 'factorisation', label: 'Factorisation' },
+    { value: 'linear-equations', label: 'Linear Equations' },
+    { value: 'simultaneous-equations', label: 'Simultaneous Equations' },
+    { value: 'inequalities', label: 'Inequalities' },
+    { value: 'polynomials', label: 'Polynomials' },
+    { value: 'functions', label: 'Functions' },
+    { value: 'exponential-functions', label: 'Exponential Functions' },
+    { value: 'logarithmic-functions', label: 'Logarithmic Functions' },
+    { value: 'sequences', label: 'Sequences' },
+  ],
   number: [
     { value: 'whole-numbers', label: 'Whole Numbers' },
     { value: 'place-value', label: 'Place Value' },
@@ -96,6 +112,23 @@ const PERCENTAGE_TOPICS = new Set([
   'percentage-increase',
   'percentage-decrease',
   'percentage-to-decimal',
+]);
+
+const ALGEBRA_TOPICS = new Set([
+  'patterns',
+  'variables',
+  'expressions',
+  'substitution',
+  'expanding-expressions',
+  'factorisation',
+  'linear-equations',
+  'simultaneous-equations',
+  'inequalities',
+  'polynomials',
+  'functions',
+  'exponential-functions',
+  'logarithmic-functions',
+  'sequences',
 ]);
 
 let allPages    = [];
@@ -202,6 +235,7 @@ function moduleLabel(module) {
     fractions: 'Fractions',
     decimals: 'Decimals',
     percentages: 'Percentages',
+    algebra: 'Algebra',
     number: 'Number',
   };
   return map[module] || 'Mathematics';
@@ -240,6 +274,20 @@ function topicLabel(topic, timesTable) {
     'percentage-increase': 'Percentage Increase Practice',
     'percentage-decrease': 'Percentage Decrease Practice',
     'percentage-to-decimal': 'Percentage to Decimal Practice',
+    patterns: 'Patterns Practice',
+    variables: 'Variables Practice',
+    expressions: 'Expressions Practice',
+    substitution: 'Substitution Practice',
+    'expanding-expressions': 'Expanding Expressions Practice',
+    factorisation: 'Factorisation Practice',
+    'linear-equations': 'Linear Equations Practice',
+    'simultaneous-equations': 'Simultaneous Equations Practice',
+    inequalities: 'Inequalities Practice',
+    polynomials: 'Polynomials Practice',
+    functions: 'Functions Practice',
+    'exponential-functions': 'Exponential Functions Practice',
+    'logarithmic-functions': 'Logarithmic Functions Practice',
+    sequences: 'Sequences Practice',
   };
   return map[topic] || 'Math Practice';
 }
@@ -438,6 +486,10 @@ function renderVerticalQuestion(num, question, symbol) {
     return renderFractionQuestion(num, question);
   }
 
+  if (question.kind === 'algebra') {
+    return renderAlgebraQuestion(num, question);
+  }
+
   if (question.kind === 'percentage') {
     return renderPercentageQuestion(num, question);
   }
@@ -535,6 +587,10 @@ function renderSolutionHTML(question) {
       return `${renderFractionTextHTML(question.prompt)} = ${renderFractionTextHTML(String(question.answer))}`;
     }
 
+    if (question.kind === 'algebra') {
+      return `${renderAlgebraPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
+    }
+
     if (question.kind === 'percentage') {
       return `${renderPercentagePromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
     }
@@ -560,6 +616,13 @@ function renderSolutionHTML(question) {
 function buildQuestions(topic, min, max, count, timesTable) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
+
+  if (ALGEBRA_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildAlgebraQuestion(topic));
+    }
+    return questions;
+  }
 
   if (PERCENTAGE_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
@@ -856,6 +919,174 @@ function buildPercentageQuestion(topic) {
   }
 }
 
+function buildAlgebraQuestion(topic) {
+  switch (topic) {
+    case 'patterns': {
+      const start = randomInt(1, 12);
+      const step = randomInt(2, 9);
+      const values = [start, start + step, start + (step * 2), start + (step * 3)];
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `${values.join(', ')}, __`,
+        answer: values[3] + step,
+      };
+    }
+    case 'variables': {
+      const variable = pickRandomFromList(['x', 'y', 'n', 'a']);
+      const coefficient = randomInt(2, 9);
+      const constant = randomInt(1, 12);
+      const phrase = randomInt(0, 1) === 0 ? `${coefficient} times ${variable} plus ${constant}` : `${constant} more than ${coefficient}${variable}`;
+      const answer = randomInt(0, 1) === 0 ? `${coefficient}${variable} + ${constant}` : `${coefficient}${variable} + ${constant}`;
+      return { kind: 'algebra', topic, prompt: `Write an expression for ${phrase}.`, answer };
+    }
+    case 'expressions': {
+      const variable = pickRandomFromList(['x', 'y', 'n']);
+      const first = randomInt(2, 6);
+      const second = randomInt(2, 6);
+      const third = randomInt(1, 5);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Simplify ${first}${variable} + ${second}${variable} + ${third}${variable}.`,
+        answer: `${first + second + third}${variable}`,
+      };
+    }
+    case 'substitution': {
+      const variable = pickRandomFromList(['x', 'y', 'n']);
+      const value = randomInt(2, 9);
+      const coefficient = randomInt(2, 8);
+      const constant = randomInt(1, 12);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Evaluate ${coefficient}${variable} + ${constant} when ${variable} = ${value}.`,
+        answer: coefficient * value + constant,
+      };
+    }
+    case 'expanding-expressions': {
+      const coefficient = randomInt(2, 9);
+      const variable = pickRandomFromList(['x', 'y', 'n']);
+      const constant = randomInt(2, 12);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Expand ${coefficient}(${variable} + ${constant}).`,
+        answer: `${coefficient}${variable} + ${coefficient * constant}`,
+      };
+    }
+    case 'factorisation': {
+      const coefficient = randomInt(2, 9);
+      const variable = pickRandomFromList(['x', 'y', 'n']);
+      const constant = randomInt(2, 12);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Factorise ${coefficient}${variable} + ${coefficient * constant}.`,
+        answer: `${coefficient}(${variable} + ${constant})`,
+      };
+    }
+    case 'linear-equations': {
+      const variable = pickRandomFromList(['x', 'y', 'n']);
+      const solution = randomInt(2, 20);
+      const constant = randomInt(1, 12);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Solve ${variable} + ${constant} = ${solution + constant}.`,
+        answer: `${variable} = ${solution}`,
+      };
+    }
+    case 'simultaneous-equations': {
+      const x = randomInt(1, 9);
+      const y = randomInt(1, 9);
+      const sum = x + y;
+      const diff = x - y;
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `x + y = ${sum}\nx - y = ${diff}`,
+        answer: `x = ${x}, y = ${y}`,
+      };
+    }
+    case 'inequalities': {
+      const variable = pickRandomFromList(['x', 'y', 'n']);
+      const solution = randomInt(2, 15);
+      const offset = randomInt(1, 9);
+      const comparison = pickRandomFromList(['>', '<']);
+      const rightSide = solution + offset;
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Solve ${variable} + ${offset} ${comparison} ${rightSide}.`,
+        answer: `${variable} ${comparison} ${solution}`,
+      };
+    }
+    case 'polynomials': {
+      const variable = 'x';
+      const first = randomInt(2, 6);
+      const second = randomInt(2, 6);
+      const third = randomInt(1, 4);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Simplify ${first}${variable}^2 + ${second}${variable}^2 + ${third}${variable}.`,
+        answer: `${first + second}${variable}^2 + ${third}${variable}`,
+      };
+    }
+    case 'functions': {
+      const variable = pickRandomFromList(['x', 'n']);
+      const value = randomInt(2, 8);
+      const multiplier = randomInt(2, 6);
+      const constant = randomInt(1, 12);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `If f(${variable}) = ${multiplier}${variable} + ${constant}, find f(${value}).`,
+        answer: multiplier * value + constant,
+      };
+    }
+    case 'exponential-functions': {
+      const base = randomInt(2, 5);
+      const exponent = randomInt(2, 4);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Evaluate ${base}^${exponent}.`,
+        answer: Math.pow(base, exponent),
+      };
+    }
+    case 'logarithmic-functions': {
+      const exponent = randomInt(2, 4);
+      const value = Math.pow(10, exponent);
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `Evaluate log10(${value}).`,
+        answer: exponent,
+      };
+    }
+    case 'sequences': {
+      const start = randomInt(1, 15);
+      const step = randomInt(2, 9);
+      const terms = [start, start + step, start + (step * 2), start + (step * 3)];
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: `${terms.join(', ')}, __`,
+        answer: terms[3] + step,
+      };
+    }
+    default:
+      return {
+        kind: 'algebra',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
+  }
+}
+
 function buildNumberQuestion(topic, min, max) {
   switch (topic) {
     case 'whole-numbers': {
@@ -1096,8 +1327,23 @@ function renderPercentageQuestion(num, question) {
     </div>`;
 }
 
+function renderAlgebraQuestion(num, question) {
+  return `
+    <div class="question question-algebra-topic">
+      <div class="question-number">${num}.</div>
+      <div class="algebra-topic-body">
+        <div class="algebra-topic-prompt">${renderAlgebraPromptHTML(question)}</div>
+        <div class="algebra-topic-answer-line"></div>
+      </div>
+    </div>`;
+}
+
 function renderPercentagePromptHTML(question) {
   return escapeHtml(String(question.prompt ?? ''));
+}
+
+function renderAlgebraPromptHTML(question) {
+  return escapeHtml(String(question.prompt ?? '')).replace(/\n/g, '<br>');
 }
 
 function renderDecimalSolutionText(question) {
@@ -1244,6 +1490,26 @@ function getPageInstruction(topic) {
 
   if (topic === 'percentage-to-decimal') {
     return 'Convert the following percentages to decimals:';
+  }
+
+  if (ALGEBRA_TOPICS.has(topic)) {
+    const map = {
+      patterns: 'Complete the patterns:',
+      variables: 'Write each expression:',
+      expressions: 'Simplify each expression:',
+      substitution: 'Substitute the values and evaluate:',
+      'expanding-expressions': 'Expand each expression:',
+      factorisation: 'Factorise each expression:',
+      'linear-equations': 'Solve each equation:',
+      'simultaneous-equations': 'Solve the simultaneous equations:',
+      inequalities: 'Solve each inequality:',
+      polynomials: 'Simplify each polynomial:',
+      functions: 'Evaluate each function:',
+      'exponential-functions': 'Evaluate each exponential function:',
+      'logarithmic-functions': 'Evaluate each logarithmic function:',
+      sequences: 'Continue the sequences:',
+    };
+    return map[topic] || 'Complete the following algebra questions:';
   }
 
   if (topic === 'whole-numbers') {
