@@ -17,16 +17,77 @@ const rangeRow         = document.getElementById('rangeRow');
 
 const QUESTIONS_PER_PAGE = 20;
 
+const MODULE_TOPICS = {
+  number: [
+    { value: 'place-value', label: 'Place Value' },
+    { value: 'number-bonds', label: 'Number Bonds' },
+    { value: 'comparing-numbers', label: 'Comparing Numbers' },
+  ],
+  arithmetic: [
+    { value: 'addition', label: 'Addition (+)' },
+    { value: 'subtraction', label: 'Subtraction (−)' },
+    { value: 'multiplication', label: 'Multiplication (×)' },
+    { value: 'division', label: 'Division (÷)' },
+    { value: 'times-tables', label: 'Times Tables' },
+    { value: 'mixed', label: 'Mixed Operations' },
+  ],
+  algebra: [
+    { value: 'patterns', label: 'Patterns' },
+    { value: 'simple-equations', label: 'Simple Equations' },
+  ],
+  geometry: [
+    { value: 'shapes', label: '2D and 3D Shapes' },
+    { value: 'angles', label: 'Angles' },
+  ],
+  measurement: [
+    { value: 'length', label: 'Length' },
+    { value: 'time', label: 'Time' },
+    { value: 'mass', label: 'Mass and Capacity' },
+  ],
+  statistics: [
+    { value: 'tally', label: 'Tally Charts' },
+    { value: 'graphs', label: 'Bar Graphs' },
+  ],
+};
+
+const IMPLEMENTED_TOPICS = new Set([
+  'addition',
+  'subtraction',
+  'multiplication',
+  'division',
+  'times-tables',
+  'mixed',
+]);
+
 let allPages    = [];
 let currentPage = 0;
 
-// Show/hide controls based on topic
+moduleSelect.addEventListener('change', () => {
+  populateTopics();
+  updateTopicControls();
+});
+
 topicSelect.addEventListener('change', () => {
+  updateTopicControls();
+});
+
+function populateTopics() {
+  const topics = MODULE_TOPICS[moduleSelect.value] || [];
+  topicSelect.innerHTML = topics
+    .map((topic) => `<option value="${topic.value}">${topic.label}</option>`)
+    .join('');
+}
+
+// Show/hide controls based on topic
+function updateTopicControls() {
   const topic = topicSelect.value;
   const isTimesTable = topic === 'times-tables';
   timesTableGroup.style.display = isTimesTable ? 'block' : 'none';
   rangeRow.style.display        = isTimesTable ? 'none' : 'flex';
-});
+}
+
+populateTopics();
+updateTopicControls();
 
 generateBtn.addEventListener('click', generateWorksheet);
 printBtn.addEventListener('click', () => window.print());
@@ -42,6 +103,11 @@ function generateWorksheet() {
   const timesTable  = parseInt(document.getElementById('timesTable').value, 10);
   const title       = document.getElementById('title').value.trim() || topicLabel(topic, timesTable);
   const includeMeta = document.getElementById('studentName').checked;
+
+  if (!IMPLEMENTED_TOPICS.has(topic)) {
+    alert('This topic is not implemented yet. For now, only Arithmetic topics generate worksheets.');
+    return;
+  }
 
   if (topic !== 'times-tables' && minNum > maxNum) {
     alert('Min Number cannot be greater than Max Number.');
