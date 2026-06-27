@@ -25,6 +25,7 @@ const MODULE_TOPICS = {
     { value: 'multiplication', label: 'Multiplication (×)' },
     { value: 'division', label: 'Division (÷)' },
     { value: 'times-tables', label: 'Times Tables' },
+    { value: 'bodmas', label: 'B.O.D.M.A.S' },
     { value: 'mixed', label: 'Mixed Operations' },
   ],
 };
@@ -141,6 +142,7 @@ function topicLabel(topic, timesTable) {
     multiplication: 'Multiplication Practice',
     division: 'Division Practice',
     'times-tables': `${timesTable} Times Table`,
+    bodmas: 'B.O.D.M.A.S Practice',
     mixed: 'Mixed Operations Practice',
   };
   return map[topic] || 'Math Practice';
@@ -198,7 +200,12 @@ function paginateQuestions(questions, title, module, includeSolutions) {
 
 function getQuestionsPerPage(questions) {
   const multiplicationOnly = questions.length > 0 && questions.every((question) => question.operation === 'multiplication');
+  const bodmasOnly = questions.length > 0 && questions.every((question) => question.operation === 'bodmas');
   const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
+
+  if (bodmasOnly) {
+    return 8;
+  }
 
   if (multiplicationOnly && hasDoubleDigitByDoubleDigit) {
     return 6;
@@ -291,12 +298,18 @@ function formatSolution(question) {
       return `${question.a} × ${question.b} = ${question.a * question.b}`;
     case 'division':
       return `${question.a} ÷ ${question.b} = ${question.a / question.b}`;
+    case 'bodmas':
+      return `${question.expression} = ${question.answer}`;
     default:
       return '';
   }
 }
 
 function renderVerticalQuestion(num, question, symbol) {
+  if (question.operation === 'bodmas') {
+    return renderBodmasQuestion(num, question);
+  }
+
   if (question.operation === 'division') {
     return renderLongDivisionQuestion(num, question);
   }
@@ -328,6 +341,17 @@ function renderLongDivisionQuestion(num, question) {
     </div>`;
 }
 
+function renderBodmasQuestion(num, question) {
+  return `
+    <div class="question question-bodmas">
+      <div class="question-number">${num}.</div>
+      <div class="bodmas-body">
+        <div class="bodmas-expression">${escapeHtml(question.expression)}</div>
+        <div class="bodmas-answer-line"></div>
+      </div>
+    </div>`;
+}
+
 function buildQuestions(topic, min, max, count, timesTable) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
@@ -339,6 +363,9 @@ function buildQuestions(topic, min, max, count, timesTable) {
       operation = 'multiplication';
       a = timesTable;
       b = randomInt(1, 12);
+    } else if (topic === 'bodmas') {
+      questions.push(buildBodmasQuestion(min, max));
+      continue;
     } else if (topic === 'mixed') {
       operation = mixedOps[randomInt(0, 3)];
       a = randomInt(min, max);
@@ -362,6 +389,58 @@ function buildQuestions(topic, min, max, count, timesTable) {
     questions.push({ a, b, operation });
   }
   return questions;
+}
+
+function buildBodmasQuestion(min, max) {
+  const lowerBound = Math.max(1, min);
+  const template = randomInt(1, 6);
+
+  const a = randomInt(lowerBound, max);
+  const b = randomInt(lowerBound, max);
+  const c = randomInt(lowerBound, max);
+
+  switch (template) {
+    case 1:
+      return {
+        operation: 'bodmas',
+        expression: `${a} + ${b} × ${c}`,
+        answer: a + (b * c),
+      };
+    case 2:
+      return {
+        operation: 'bodmas',
+        expression: `(${a} + ${b}) × ${c}`,
+        answer: (a + b) * c,
+      };
+    case 3:
+      return {
+        operation: 'bodmas',
+        expression: `${a} × ${b} + ${c}`,
+        answer: (a * b) + c,
+      };
+    case 4:
+      return {
+        operation: 'bodmas',
+        expression: `${a} × (${b} + ${c})`,
+        answer: a * (b + c),
+      };
+    case 5:
+      return {
+        operation: 'bodmas',
+        expression: `${a} × ${b} - ${c}`,
+        answer: (a * b) - c,
+      };
+    default: {
+      const divisor = randomInt(lowerBound, max);
+      const multiplier = randomInt(lowerBound, max);
+      const dividend = divisor * multiplier;
+      return {
+        operation: 'bodmas',
+        expression: `${a} + ${dividend} ÷ ${divisor}`,
+        answer: a + (dividend / divisor),
+      };
+    }
+  }
 }
 
 function randomInt(min, max) {
