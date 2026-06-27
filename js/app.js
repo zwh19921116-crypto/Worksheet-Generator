@@ -72,7 +72,6 @@ const MODULE_TOPICS = {
     { value: 'scale-drawings', label: 'Scale Drawings' },
   ],
   statistics: [
-    { value: 'data-collection', label: 'Data Collection' },
     { value: 'tables', label: 'Tables' },
     { value: 'graphs', label: 'Graphs' },
     { value: 'mean', label: 'Mean' },
@@ -209,7 +208,6 @@ const TRIGONOMETRY_TOPICS = new Set([
   'applications-of-trigonometry',
 ]);
 const STATISTICS_TOPICS = new Set([
-  'data-collection',
   'tables',
   'graphs',
   'mean',
@@ -381,7 +379,6 @@ function topicLabel(topic, timesTable) {
     'percentage-increase': 'Percentage Increase Practice',
     'percentage-decrease': 'Percentage Decrease Practice',
     'percentage-to-decimal': 'Percentage to Decimal Practice',
-    'data-collection': 'Data Collection Practice',
     tables: 'Tables Practice',
     graphs: 'Graphs Practice',
     mean: 'Mean Practice',
@@ -792,11 +789,13 @@ function renderMeasurementQuestion(num, question) {
 }
 
 function renderStatisticsQuestion(num, question) {
+  const tableHTML = question.topic === 'tables' ? renderStatisticsFrequencyTableHTML(question) : '';
   return `
     <div class="question question-number-topic question-statistics-topic">
       <div class="question-number">${num}.</div>
       <div class="number-topic-body statistics-topic-body">
         <div class="number-topic-prompt statistics-topic-prompt">${renderStatisticsPromptHTML(question)}</div>
+        ${tableHTML}
         <div class="number-topic-answer-line statistics-topic-answer-line"></div>
       </div>
     </div>`;
@@ -831,6 +830,54 @@ function renderStatisticsPromptHTML(question) {
   const dataHTML = question.data ? `<div class="statistics-topic-data">${escapeHtml(String(question.data))}</div>` : '';
   const promptHTML = `<div class="statistics-topic-question">${escapeHtml(String(question.prompt ?? ''))}</div>`;
   return `${dataHTML}${promptHTML}`;
+}
+
+function renderStatisticsFrequencyTableHTML(question) {
+  const rows = Array.isArray(question.tableRows) ? question.tableRows : [];
+  const rowHTML = rows.map((row) => `
+    <tr>
+      <td>${escapeHtml(String(row.value))}</td>
+      <td><span class="statistics-frequency-blank">&nbsp;</span></td>
+    </tr>`).join('');
+
+  return `
+    <div class="statistics-frequency-table-wrap">
+      <table class="statistics-frequency-table">
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Frequency</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowHTML}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderStatisticsFrequencyTableSolutionHTML(question) {
+  const rows = Array.isArray(question.tableRows) ? question.tableRows : [];
+  const rowHTML = rows.map((row) => `
+    <tr>
+      <td>${escapeHtml(String(row.value))}</td>
+      <td>${escapeHtml(String(row.frequency))}</td>
+    </tr>`).join('');
+
+  return `
+    <div class="statistics-frequency-table-wrap">
+      <table class="statistics-frequency-table statistics-frequency-table-solution">
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Frequency</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowHTML}
+        </tbody>
+      </table>
+    </div>`;
 }
 
 function renderTrigonometryShapeSVG(question) {
@@ -968,6 +1015,9 @@ function renderSolutionHTML(question) {
     }
 
     if (question.kind === 'statistics') {
+      if (question.topic === 'tables') {
+        return renderStatisticsFrequencyTableSolutionHTML(question);
+      }
       return `${renderStatisticsPromptHTML(question)} = ${escapeHtml(String(question.answer ?? ''))}`;
     }
 
@@ -1526,18 +1576,17 @@ function buildStatisticsQuestion(topic, min, max) {
     const standardDeviation = Math.sqrt(meanSquared);
 
     switch (topic) {
-      case 'data-collection': {
-        const scenarios = [
-          { prompt: 'What is the best way to collect data about students favourite sport?', answer: 'Survey' },
-          { prompt: 'What method would you use to collect data from a large school year group?', answer: 'Questionnaire' },
-          { prompt: 'What type of data collection would be quickest for a yes/no question?', answer: 'Survey' },
-          { prompt: 'Which method is best for asking people their opinion?', answer: 'Interview or survey' },
-        ];
-        const scenario = pickRandomFromList(scenarios);
-        return { kind: 'statistics', topic, prompt: scenario.prompt, answer: scenario.answer };
-      }
       case 'tables': {
-        return { kind: 'statistics', topic, data: dataString, prompt: 'Use the data to complete the frequency table.', answer: 'Frequency table' };
+        const frequencyMap = new Map();
+        values.forEach((value) => frequencyMap.set(value, (frequencyMap.get(value) || 0) + 1));
+          return {
+            kind: 'statistics',
+            topic,
+            data: dataString,
+          tableRows: buildFrequencyTableRows(values, frequencyMap),
+            prompt: 'Use the data to complete the frequency table.',
+            answer: 'Frequency table',
+          };
       }
       case 'graphs': {
         const graphTypes = [
@@ -1855,6 +1904,14 @@ function buildMeasurementQuestion(topic, min, max) {
         answer: '',
       };
   }
+}
+
+function buildFrequencyTableRows(values, frequencyMap = new Map()) {
+  const uniqueValues = [...new Set(values)].sort((a, b) => a - b);
+  return uniqueValues.map((value) => ({
+    value,
+    frequency: frequencyMap.get(value) ?? values.filter((item) => item === value).length,
+  }));
 }
 
 function buildTrigonometryQuestion(topic, min, max) {
