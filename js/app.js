@@ -707,7 +707,7 @@ function buildNumberQuestion(topic, min, max) {
       return {
         kind: 'number',
         topic,
-        prompt: `Write ${value} in words.`,
+        prompt: `${value}`,
         answer: numberToWords(value),
       };
     }
@@ -731,7 +731,7 @@ function buildNumberQuestion(topic, min, max) {
       return {
         kind: 'number',
         topic,
-        prompt: `Order these numbers from smallest to largest: ${values.join(', ')}`,
+        prompt: values.join(', '),
         answer: values.slice().sort((a, b) => a - b).join(', '),
       };
     }
@@ -740,7 +740,7 @@ function buildNumberQuestion(topic, min, max) {
       return {
         kind: 'number',
         topic,
-        prompt: `List all the factors of ${value}.`,
+        prompt: `${value}`,
         answer: getFactors(value).join(', '),
       };
     }
@@ -750,7 +750,7 @@ function buildNumberQuestion(topic, min, max) {
       return {
         kind: 'number',
         topic,
-        prompt: `Write the first ${countLimit} multiples of ${value}.`,
+        prompt: `${value}`,
         answer: Array.from({ length: countLimit }, (_, index) => value * (index + 1)).join(', '),
       };
     }
@@ -779,7 +779,7 @@ function buildNumberQuestion(topic, min, max) {
       return {
         kind: 'number',
         topic,
-        prompt: `Order these integers from least to greatest: ${values.join(', ')}`,
+        prompt: values.join(', '),
         answer: values.slice().sort((a, b) => a - b).join(', '),
       };
     }
@@ -799,7 +799,7 @@ function buildNumberQuestion(topic, min, max) {
       return {
         kind: 'number',
         topic,
-        prompt: `Write ${value} in scientific notation.`,
+        prompt: `${value}`,
         answer: scientific,
       };
     }
@@ -922,6 +922,30 @@ function renderFractionTextHTML(value) {
 }
 
 function getPageInstruction(topic) {
+  if (topic === 'whole-numbers') {
+    return 'Write the following in words:';
+  }
+
+  if (topic === 'ordering-numbers') {
+    return 'Order the following numbers from smallest to largest:';
+  }
+
+  if (topic === 'factors') {
+    return 'List all the factors of the following number:';
+  }
+
+  if (topic === 'multiples') {
+    return 'Write the first 5 multiples of the following number:';
+  }
+
+  if (topic === 'integers') {
+    return 'Order the following integers from least to greatest:';
+  }
+
+  if (topic === 'scientific-notation') {
+    return 'Write the following in scientific notation:';
+  }
+
   if (topic === 'equivalent-fractions') {
     return 'Write an equivalent fraction for the following:';
   }
