@@ -453,10 +453,12 @@ main {
 }
 
 .page-instruction {
-  margin-top: 2mm;
+  margin-top: 4mm;
+  margin-left: 1mm;
   font-size: 0.95rem;
   font-weight: 600;
   color: #2d3748;
+  text-align: left;
 }
 
 .fraction-inline {

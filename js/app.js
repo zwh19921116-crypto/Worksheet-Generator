@@ -914,7 +914,7 @@ function renderFractionTextHTML(value) {
 
 function getPageInstruction(topic) {
   if (topic === 'mixed-fractions') {
-    return 'Convert the following to a mixed fraction';
+    return 'Convert the following to a mixed fraction:';
   }
 
   return '';
