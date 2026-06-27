@@ -180,9 +180,11 @@ function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum,
   html += `</div>`;
 
   // Page footer
-  if (totalPages > 1) {
-    html += `<div class="page-footer">Page ${pageNum} of ${totalPages}</div>`;
-  }
+  html += `
+    <div class="page-footer">
+      <span class="page-footer-left">www.edgeducate.com.au</span>
+      <span class="page-footer-right">Page ${pageNum} of ${totalPages}</span>
+    </div>`;
 
   html += `</div>`;
   return html;

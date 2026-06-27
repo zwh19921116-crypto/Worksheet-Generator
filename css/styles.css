@@ -402,11 +402,18 @@ main {
 
 /* ---- Page Footer ---- */
 .page-footer {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 0.75rem;
   color: #a0aec0;
   margin-top: auto;
   padding-top: 6mm;
+}
+
+.page-footer-left,
+.page-footer-right {
+  white-space: nowrap;
 }
 
 /* ---- Print Styles ---- */
