@@ -318,7 +318,7 @@ function buildSolutionsPageHTML(questions, startIdx, title, module, pageNum, tot
   html += `<div class="solutions-grid">`;
   questions.forEach((question, idx) => {
     const num = startIdx + idx + 1;
-    html += `<div class="solution-item"><span class="solution-number">${num}.</span><span class="solution-answer">${escapeHtml(formatSolution(question))}</span></div>`;
+    html += `<div class="solution-item"><span class="solution-number">${num}.</span><span class="solution-answer">${renderSolutionHTML(question)}</span></div>`;
   });
   html += `</div>`;
 
@@ -409,10 +409,18 @@ function renderNumberQuestion(num, question) {
     <div class="question question-number-topic">
       <div class="question-number">${num}.</div>
       <div class="number-topic-body">
-        <div class="number-topic-prompt">${escapeHtml(question.prompt)}</div>
+        <div class="number-topic-prompt">${renderNumberPromptHTML(question)}</div>
         <div class="number-topic-answer-line"></div>
       </div>
     </div>`;
+}
+
+function renderSolutionHTML(question) {
+  if (question.kind !== 'number') {
+    return escapeHtml(formatSolution(question));
+  }
+
+  return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
 }
 
 function buildQuestions(topic, min, max, count, timesTable) {
@@ -703,6 +711,29 @@ function numberToWords(value) {
   }
 
   return String(value);
+}
+
+function renderNumberPromptHTML(question) {
+  switch (question.topic) {
+    case 'indices': {
+      const match = question.prompt.match(/^Evaluate (\d+)\^(\d+)\.$/);
+      if (match) {
+        const base = escapeHtml(match[1]);
+        const exponent = escapeHtml(match[2]);
+        return `Evaluate ${base}<sup>${exponent}</sup>.`;
+      }
+      return escapeHtml(question.prompt);
+    }
+    case 'scientific-notation': {
+      const match = question.prompt.match(/^Write (\d+) in scientific notation\.$/);
+      if (match) {
+        return `Write ${escapeHtml(match[1])} in scientific notation.`;
+      }
+      return escapeHtml(question.prompt);
+    }
+    default:
+      return escapeHtml(question.prompt);
+  }
 }
 
 const PRIME_NUMBERS = [
