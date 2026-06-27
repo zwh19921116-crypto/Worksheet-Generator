@@ -610,7 +610,7 @@ function buildFractionQuestion(topic) {
       return {
         kind: 'fraction',
         topic,
-        prompt: `Write an equivalent fraction for ${fractionToText(fraction)}.`,
+        prompt: fractionToText(fraction),
         answer: fractionToText({ numerator: fraction.numerator * multiplier, denominator: fraction.denominator * multiplier }),
       };
     }
@@ -922,6 +922,10 @@ function renderFractionTextHTML(value) {
 }
 
 function getPageInstruction(topic) {
+  if (topic === 'equivalent-fractions') {
+    return 'Write an equivalent fraction for the following:';
+  }
+
   if (topic === 'mixed-fractions') {
     return 'Convert the following to a mixed fraction:';
   }
