@@ -417,6 +417,36 @@ main {
   white-space: nowrap;
 }
 
+.solutions-page .worksheet-header {
+  margin-bottom: 6mm;
+}
+
+.solutions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3mm 10mm;
+  align-content: start;
+  flex: 1;
+}
+
+.solution-item {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #1a202c;
+}
+
+.solution-number {
+  min-width: 1.8rem;
+  font-weight: 700;
+  color: #4a5568;
+}
+
+.solution-answer {
+  font-weight: 600;
+}
+
 /* ---- Print Styles ---- */
 @media print {
   body { background: #fff; }

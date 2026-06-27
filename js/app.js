@@ -15,6 +15,7 @@ const topicSelect      = document.getElementById('topic');
 const timesTableGroup  = document.getElementById('timesTableGroup');
 const rangeRow         = document.getElementById('rangeRow');
 const titleInput       = document.getElementById('title');
+const solutionsCheckbox = document.getElementById('solutionsRequired');
 
 const MODULE_TOPICS = {
   arithmetic: [
@@ -91,6 +92,7 @@ function generateWorksheet() {
   const titleSuffix = titleInput.value.trim() || defaultTitleSuffix();
   const title       = `Edgeducate: ${titleSuffix}`;
   const includeMeta = document.getElementById('studentName').checked;
+  const includeSolutions = solutionsCheckbox.checked;
 
   if (topic !== 'times-tables' && minNum > maxNum) {
     alert('Min Number cannot be greater than Max Number.');
@@ -98,7 +100,7 @@ function generateWorksheet() {
   }
 
   const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable);
-  allPages = paginateQuestions(questions, title, module, includeMeta);
+  allPages = paginateQuestions(questions, title, module, includeMeta, includeSolutions);
   currentPage = 0;
   showPage(0);
   printBtn.disabled = false;
@@ -123,17 +125,56 @@ function topicLabel(topic, timesTable) {
   return map[topic] || 'Math Practice';
 }
 
-function paginateQuestions(questions, title, module, includeMeta) {
-  const pages = [];
+function paginateQuestions(questions, title, module, includeMeta, includeSolutions) {
+  const pageModels = [];
   const questionsPerPage = getQuestionsPerPage(questions);
-  const totalPages = Math.ceil(questions.length / questionsPerPage);
+  const worksheetPageCount = Math.ceil(questions.length / questionsPerPage);
 
-  for (let p = 0; p < totalPages; p++) {
+  for (let p = 0; p < worksheetPageCount; p++) {
     const slice    = questions.slice(p * questionsPerPage, (p + 1) * questionsPerPage);
     const startIdx = p * questionsPerPage;
-    pages.push(buildPageHTML(slice, startIdx, title, module, includeMeta, p + 1, totalPages));
+    pageModels.push({
+      type: 'worksheet',
+      questions: slice,
+      startIdx,
+      title,
+      module,
+      includeMeta,
+    });
   }
-  return pages;
+
+  if (includeSolutions) {
+    const solutionsPerPage = 20;
+    const solutionPageCount = Math.ceil(questions.length / solutionsPerPage);
+    for (let p = 0; p < solutionPageCount; p++) {
+      const slice = questions.slice(p * solutionsPerPage, (p + 1) * solutionsPerPage);
+      const startIdx = p * solutionsPerPage;
+      pageModels.push({
+        type: 'solutions',
+        questions: slice,
+        startIdx,
+        title,
+        module,
+      });
+    }
+  }
+
+  const totalPages = pageModels.length;
+  return pageModels.map((pageModel, index) => {
+    if (pageModel.type === 'solutions') {
+      return buildSolutionsPageHTML(pageModel.questions, pageModel.startIdx, pageModel.title, pageModel.module, index + 1, totalPages);
+    }
+
+    return buildPageHTML(
+      pageModel.questions,
+      pageModel.startIdx,
+      pageModel.title,
+      pageModel.module,
+      pageModel.includeMeta,
+      index + 1,
+      totalPages
+    );
+  });
 }
 
 function getQuestionsPerPage(questions) {
@@ -195,6 +236,45 @@ function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum,
 
   html += `</div>`;
   return html;
+}
+
+function buildSolutionsPageHTML(questions, startIdx, title, module, pageNum, totalPages) {
+  let html = `<div class="a4-page solutions-page">`;
+
+  html += `<div class="worksheet-header"><h2>${escapeHtml(title)} - Solutions</h2>`;
+  html += `<div class="worksheet-module">Module: ${escapeHtml(moduleLabel(module))}</div>`;
+  html += `</div>`;
+
+  html += `<div class="solutions-grid">`;
+  questions.forEach((question, idx) => {
+    const num = startIdx + idx + 1;
+    html += `<div class="solution-item"><span class="solution-number">${num}.</span><span class="solution-answer">${escapeHtml(formatSolution(question))}</span></div>`;
+  });
+  html += `</div>`;
+
+  html += `
+    <div class="page-footer">
+      <span class="page-footer-left">www.edgeducate.com.au</span>
+      <span class="page-footer-right">Page ${pageNum} of ${totalPages}</span>
+    </div>`;
+
+  html += `</div>`;
+  return html;
+}
+
+function formatSolution(question) {
+  switch (question.operation) {
+    case 'addition':
+      return `${question.a} + ${question.b} = ${question.a + question.b}`;
+    case 'subtraction':
+      return `${question.a} - ${question.b} = ${question.a - question.b}`;
+    case 'multiplication':
+      return `${question.a} × ${question.b} = ${question.a * question.b}`;
+    case 'division':
+      return `${question.a} ÷ ${question.b} = ${question.a / question.b}`;
+    default:
+      return '';
+  }
 }
 
 function renderVerticalQuestion(num, question, symbol) {
