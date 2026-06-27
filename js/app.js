@@ -542,10 +542,11 @@ function buildNumberQuestion(topic, min, max) {
       const index = randomInt(0, digits.length - 1);
       const digit = digits[index];
       const placeValue = Number(digit) * Math.pow(10, digits.length - index - 1);
+      const placeName = getPlaceName(digits.length - index - 1);
       return {
         kind: 'number',
         topic,
-        prompt: `What is the value of the ${digit} in ${value}?`,
+        prompt: `What is the value of the ${digit} in the ${placeName} place of ${value}?`,
         answer: placeValue,
       };
     }
@@ -666,6 +667,27 @@ function uniqueRandomValues(count, min, max) {
 
 function pickRandomFromList(list) {
   return list[randomInt(0, list.length - 1)];
+}
+
+function getPlaceName(power) {
+  switch (power) {
+    case 0:
+      return 'ones';
+    case 1:
+      return 'tens';
+    case 2:
+      return 'hundreds';
+    case 3:
+      return 'thousands';
+    case 4:
+      return 'ten-thousands';
+    case 5:
+      return 'hundred-thousands';
+    case 6:
+      return 'millions';
+    default:
+      return `10^${power}`;
+  }
 }
 
 function pickNonPrimeNumber() {
