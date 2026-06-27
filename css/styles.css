@@ -598,6 +598,15 @@ main {
   height: 8.8rem;
 }
 
+.trigonometry-shape-icon {
+  width: 12.5rem;
+  height: 10rem;
+}
+
+.trigonometry-shape-stack {
+  gap: 0.85rem;
+}
+
 .measurement-shape-icon svg text {
   letter-spacing: 0.01em;
 }

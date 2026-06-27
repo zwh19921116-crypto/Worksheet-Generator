@@ -71,6 +71,13 @@ const MODULE_TOPICS = {
     { value: 'unit-conversions', label: 'Unit Conversions' },
     { value: 'scale-drawings', label: 'Scale Drawings' },
   ],
+  trigonometry: [
+    { value: 'right-angle-trigonometry', label: 'Right Angle Trigonometry' },
+    { value: 'sine-rule', label: 'Sine Rule' },
+    { value: 'cosine-rule', label: 'Cosine Rule' },
+    { value: 'bearings', label: 'Bearings' },
+    { value: 'applications-of-trigonometry', label: 'Applications of Trigonometry' },
+  ],
   algebra: [
     { value: 'patterns', label: 'Patterns' },
     { value: 'variables', label: 'Variables' },
@@ -181,6 +188,14 @@ const MEASUREMENT_TOPICS = new Set([
   'scale-drawings',
 ]);
 
+const TRIGONOMETRY_TOPICS = new Set([
+  'right-angle-trigonometry',
+  'sine-rule',
+  'cosine-rule',
+  'bearings',
+  'applications-of-trigonometry',
+]);
+
 let allPages    = [];
 let currentPage = 0;
 let lastGeneratedQuestions = [];
@@ -287,6 +302,7 @@ function moduleLabel(module) {
     percentages: 'Percentages',
     geometry: 'Geometry',
     measurement: 'Measurement',
+    trigonometry: 'Trigonometry',
     algebra: 'Algebra',
     number: 'Number',
   };
@@ -360,6 +376,11 @@ function topicLabel(topic, timesTable) {
     time: 'Time Practice',
     'unit-conversions': 'Unit Conversions Practice',
     'scale-drawings': 'Scale Drawings Practice',
+    'right-angle-trigonometry': 'Right Angle Trigonometry Practice',
+    'sine-rule': 'Sine Rule Practice',
+    'cosine-rule': 'Cosine Rule Practice',
+    bearings: 'Bearings Practice',
+    'applications-of-trigonometry': 'Applications of Trigonometry Practice',
   };
   return map[topic] || 'Math Practice';
 }
@@ -598,6 +619,10 @@ function renderVerticalQuestion(num, question, symbol) {
     return renderMeasurementQuestion(num, question);
   }
 
+  if (question.kind === 'trigonometry') {
+    return renderTrigonometryQuestion(num, question);
+  }
+
   if (question.operation === 'bodmas') {
     return renderBodmasQuestion(num, question);
   }
@@ -707,6 +732,62 @@ function renderMeasurementQuestion(num, question) {
     </div>`;
 }
 
+function renderTrigonometryQuestion(num, question) {
+  return `
+    <div class="question question-number-topic">
+      <div class="question-number">${num}.</div>
+      <div class="number-topic-body">
+        <div class="number-topic-prompt">${renderTrigonometryPromptHTML(question)}</div>
+        <div class="number-topic-answer-line"></div>
+      </div>
+    </div>`;
+}
+
+function renderTrigonometryPromptHTML(question) {
+  const label = escapeHtml(String(question.prompt ?? ''));
+  const shapeSvg = renderTrigonometryShapeSVG(question);
+  if (!shapeSvg) {
+    return label;
+  }
+
+  return `
+    <span class="geometry-shape-stack trigonometry-shape-stack">
+      <span class="geometry-shape-question">${label}</span>
+      <span class="geometry-shape-icon trigonometry-shape-icon" aria-hidden="true">${shapeSvg}</span>
+    </span>`;
+}
+
+function renderTrigonometryShapeSVG(question) {
+  if (!TRIGONOMETRY_TOPICS.has(question.topic) || !question.shape) {
+    return '';
+  }
+
+  const dims = question.dimensions || {};
+  const n = (value, suffix = '') => escapeHtml(`${value}${suffix}`);
+
+  if (question.shape === 'right-triangle') {
+    return `<svg viewBox="0 0 150 110" aria-hidden="true"><polygon points="22,88 122,88 122,28" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M114 88 L114 80 L122 80" fill="none" stroke="currentColor" stroke-width="2"/><path d="M38 88 A16 16 0 0 1 53 75" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="56" y="79" font-size="9" font-weight="700" fill="currentColor">${n(dims.angle, '°')}</text><text x="72" y="100" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor">adj=?</text><text x="127" y="59" text-anchor="start" font-size="9.5" font-weight="700" fill="currentColor">opp=?</text><text x="66" y="52" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor">hyp=${n(dims.hypotenuse, ' cm')}</text></svg>`;
+  }
+
+  if (question.shape === 'sine-rule-triangle') {
+    return `<svg viewBox="0 0 170 130" aria-hidden="true"><polygon points="36,102 136,102 88,30" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="30" y="114" text-anchor="middle" font-size="8.5" font-weight="700" fill="currentColor">B</text><text x="142" y="114" text-anchor="middle" font-size="8.5" font-weight="700" fill="currentColor">C</text><text x="88" y="22" text-anchor="middle" font-size="8.5" font-weight="700" fill="currentColor">A</text><text x="86" y="122" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor">a=${n(dims.sideA, ' cm')}</text><text x="120" y="64" text-anchor="start" font-size="9.5" font-weight="700" fill="currentColor">b=?</text><path d="M78 40 Q88 48 98 40" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="88" y="34" text-anchor="middle" font-size="9" font-weight="700" fill="currentColor">A=${n(dims.angleA, '°')}</text><path d="M48 100 Q58 90 62 76" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="66" y="80" font-size="9" font-weight="700" fill="currentColor">B=${n(dims.angleB, '°')}</text></svg>`;
+  }
+
+  if (question.shape === 'cosine-rule-triangle') {
+    return `<svg viewBox="0 0 170 130" aria-hidden="true"><polygon points="36,102 136,102 88,30" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="30" y="114" text-anchor="middle" font-size="8.5" font-weight="700" fill="currentColor">B</text><text x="142" y="114" text-anchor="middle" font-size="8.5" font-weight="700" fill="currentColor">C</text><text x="88" y="22" text-anchor="middle" font-size="8.5" font-weight="700" fill="currentColor">A</text><text x="86" y="122" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor">a=?</text><text x="118" y="64" text-anchor="start" font-size="9.5" font-weight="700" fill="currentColor">b=${n(dims.sideB, ' cm')}</text><text x="56" y="64" text-anchor="end" font-size="9.5" font-weight="700" fill="currentColor">c=${n(dims.sideC, ' cm')}</text><path d="M78 40 Q88 48 98 40" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="88" y="34" text-anchor="middle" font-size="9" font-weight="700" fill="currentColor">A=${n(dims.angleA, '°')}</text></svg>`;
+  }
+
+  if (question.shape === 'bearings-compass') {
+    return `<svg viewBox="0 0 150 110" aria-hidden="true"><circle cx="75" cy="58" r="24" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="75" y1="34" x2="75" y2="16" stroke="currentColor" stroke-width="2.2"/><text x="75" y="12" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor">N</text><line x1="75" y1="58" x2="97" y2="42" stroke="currentColor" stroke-width="2.2"/><path d="M75 44 A14 14 0 0 1 88 49" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="102" y="44" text-anchor="start" font-size="9" font-weight="700" fill="currentColor">${n(String(dims.bearingAB).padStart(3, '0'), '°')}</text><text x="20" y="100" text-anchor="start" font-size="9.5" font-weight="700" fill="currentColor">reverse: ?°</text></svg>`;
+  }
+
+  if (question.shape === 'ladder-application') {
+    return `<svg viewBox="0 0 150 110" aria-hidden="true"><line x1="20" y1="88" x2="130" y2="88" stroke="currentColor" stroke-width="2.2"/><line x1="110" y1="88" x2="110" y2="24" stroke="currentColor" stroke-width="2.2"/><line x1="30" y1="88" x2="110" y2="24" stroke="currentColor" stroke-width="2.2"/><path d="M40 88 A14 14 0 0 1 52 79" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="56" y="80" font-size="9" font-weight="700" fill="currentColor">${n(dims.angle, '°')}</text><text x="74" y="52" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor">${n(dims.ladderLength, ' m')}</text><text x="116" y="60" text-anchor="start" font-size="9.5" font-weight="700" fill="currentColor">h=?</text></svg>`;
+  }
+
+  return '';
+}
+
 function renderMeasurementPromptHTML(question) {
   const label = escapeHtml(String(question.prompt ?? ''));
   const shapeSvg = renderMeasurementShapeSVG(question);
@@ -801,6 +882,10 @@ function renderSolutionHTML(question) {
       return `${escapeHtml(String(question.prompt ?? ''))} = ${escapeHtml(String(question.answer ?? ''))}`;
     }
 
+    if (question.kind === 'trigonometry') {
+      return `${escapeHtml(String(question.prompt ?? ''))} = ${escapeHtml(String(question.answer ?? ''))}`;
+    }
+
     return escapeHtml(formatSolution(question));
   }
 
@@ -833,6 +918,13 @@ function buildQuestions(topic, min, max, count, timesTable) {
   if (MEASUREMENT_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
       questions.push(buildMeasurementQuestion(topic, min, max));
+    }
+    return questions;
+  }
+
+  if (TRIGONOMETRY_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildTrigonometryQuestion(topic, min, max));
     }
     return questions;
   }
@@ -1306,12 +1398,19 @@ function buildGeometryQuestion(topic) {
 }
 
 function buildMeasurementQuestion(topic, min, max) {
-  const safeMin = Math.max(1, min);
-  const safeMax = Math.max(safeMin + 1, max);
+  const parsedMin = Number.isFinite(min) ? min : 1;
+  const parsedMax = Number.isFinite(max) ? max : 12;
+  const safeMin = Math.max(1, Math.min(parsedMin, parsedMax));
+  const safeMax = Math.max(safeMin, Math.max(parsedMin, parsedMax));
+  const rangeInt = (minimumValue = 1) => {
+    const low = Math.max(minimumValue, safeMin);
+    const high = Math.max(low, safeMax);
+    return randomInt(low, high);
+  };
 
   switch (topic) {
     case 'length': {
-      const meters = randomInt(safeMin, Math.min(20, safeMax));
+      const meters = rangeInt(1);
       return {
         kind: 'measurement',
         topic,
@@ -1323,8 +1422,8 @@ function buildMeasurementQuestion(topic, min, max) {
       const shapeType = pickRandomFromList(['rectangle', 'square', 'triangle', 'parallelogram']);
 
       if (shapeType === 'rectangle') {
-        const length = randomInt(2, 20);
-        const width = randomInt(2, 20);
+        const length = rangeInt(2);
+        const width = rangeInt(2);
         return {
           kind: 'measurement',
           topic,
@@ -1336,7 +1435,7 @@ function buildMeasurementQuestion(topic, min, max) {
       }
 
       if (shapeType === 'square') {
-        const side = randomInt(2, 20);
+        const side = rangeInt(2);
         return {
           kind: 'measurement',
           topic,
@@ -1348,8 +1447,8 @@ function buildMeasurementQuestion(topic, min, max) {
       }
 
       if (shapeType === 'triangle') {
-        const base = randomInt(2, 20);
-        const height = randomInt(2, 20);
+        const base = rangeInt(2);
+        const height = rangeInt(2);
         const area = (base * height) / 2;
         return {
           kind: 'measurement',
@@ -1361,8 +1460,8 @@ function buildMeasurementQuestion(topic, min, max) {
         };
       }
 
-      const base = randomInt(2, 20);
-      const height = randomInt(2, 20);
+      const base = rangeInt(2);
+      const height = rangeInt(2);
       return {
         kind: 'measurement',
         topic,
@@ -1376,8 +1475,8 @@ function buildMeasurementQuestion(topic, min, max) {
       const shapeType = pickRandomFromList(['rectangle', 'square', 'triangle', 'regular-pentagon']);
 
       if (shapeType === 'rectangle') {
-        const length = randomInt(2, 20);
-        const width = randomInt(2, 20);
+        const length = rangeInt(2);
+        const width = rangeInt(2);
         return {
           kind: 'measurement',
           topic,
@@ -1389,7 +1488,7 @@ function buildMeasurementQuestion(topic, min, max) {
       }
 
       if (shapeType === 'square') {
-        const side = randomInt(2, 20);
+        const side = rangeInt(2);
         return {
           kind: 'measurement',
           topic,
@@ -1401,9 +1500,11 @@ function buildMeasurementQuestion(topic, min, max) {
       }
 
       if (shapeType === 'triangle') {
-        const a = randomInt(3, 20);
-        const b = randomInt(3, 20);
-        const c = randomInt(Math.abs(a - b) + 1, a + b - 1);
+        const a = rangeInt(3);
+        const b = rangeInt(3);
+        const cMin = Math.abs(a - b) + 1;
+        const cMax = a + b - 1;
+        const c = randomInt(cMin, Math.max(cMin, Math.min(cMax, safeMax)));
         return {
           kind: 'measurement',
           topic,
@@ -1414,7 +1515,7 @@ function buildMeasurementQuestion(topic, min, max) {
         };
       }
 
-      const side = randomInt(2, 20);
+      const side = rangeInt(2);
       return {
         kind: 'measurement',
         topic,
@@ -1428,9 +1529,9 @@ function buildMeasurementQuestion(topic, min, max) {
       const solidType = pickRandomFromList(['cuboid', 'cube', 'cylinder', 'triangular-prism']);
 
       if (solidType === 'cuboid') {
-        const l = randomInt(2, 12);
-        const w = randomInt(2, 12);
-        const h = randomInt(2, 12);
+        const l = rangeInt(2);
+        const w = rangeInt(2);
+        const h = rangeInt(2);
         return {
           kind: 'measurement',
           topic,
@@ -1442,7 +1543,7 @@ function buildMeasurementQuestion(topic, min, max) {
       }
 
       if (solidType === 'cube') {
-        const side = randomInt(2, 14);
+        const side = rangeInt(2);
         return {
           kind: 'measurement',
           topic,
@@ -1454,8 +1555,8 @@ function buildMeasurementQuestion(topic, min, max) {
       }
 
       if (solidType === 'cylinder') {
-        const radius = randomInt(2, 10);
-        const height = randomInt(2, 16);
+        const radius = rangeInt(2);
+        const height = rangeInt(2);
         return {
           kind: 'measurement',
           topic,
@@ -1466,9 +1567,9 @@ function buildMeasurementQuestion(topic, min, max) {
         };
       }
 
-      const base = randomInt(2, 14);
-      const triHeight = randomInt(2, 14);
-      const length = randomInt(2, 14);
+      const base = rangeInt(2);
+      const triHeight = rangeInt(2);
+      const length = rangeInt(2);
       const volume = (base * triHeight * length) / 2;
       return {
         kind: 'measurement',
@@ -1480,7 +1581,7 @@ function buildMeasurementQuestion(topic, min, max) {
       };
     }
     case 'surface-area': {
-      const side = randomInt(2, 20);
+      const side = rangeInt(2);
       return {
         kind: 'measurement',
         topic,
@@ -1491,7 +1592,7 @@ function buildMeasurementQuestion(topic, min, max) {
       };
     }
     case 'capacity': {
-      const liters = randomInt(1, 25);
+      const liters = rangeInt(1);
       return {
         kind: 'measurement',
         topic,
@@ -1500,7 +1601,7 @@ function buildMeasurementQuestion(topic, min, max) {
       };
     }
     case 'mass': {
-      const kg = randomInt(1, 30);
+      const kg = rangeInt(1);
       return {
         kind: 'measurement',
         topic,
@@ -1509,7 +1610,7 @@ function buildMeasurementQuestion(topic, min, max) {
       };
     }
     case 'time': {
-      const hours = randomInt(1, 6);
+      const hours = rangeInt(1);
       const minutes = randomInt(1, 11) * 5;
       return {
         kind: 'measurement',
@@ -1521,7 +1622,7 @@ function buildMeasurementQuestion(topic, min, max) {
     case 'unit-conversions': {
       const conversionType = pickRandomFromList(['length', 'mass', 'capacity']);
       if (conversionType === 'length') {
-        const cm = randomInt(100, 2500);
+        const cm = rangeInt(1) * 100;
         return {
           kind: 'measurement',
           topic,
@@ -1531,7 +1632,7 @@ function buildMeasurementQuestion(topic, min, max) {
       }
 
       if (conversionType === 'mass') {
-        const grams = randomInt(200, 9000);
+        const grams = rangeInt(1) * 100;
         return {
           kind: 'measurement',
           topic,
@@ -1540,7 +1641,7 @@ function buildMeasurementQuestion(topic, min, max) {
         };
       }
 
-      const ml = randomInt(250, 9500);
+      const ml = rangeInt(1) * 250;
       return {
         kind: 'measurement',
         topic,
@@ -1550,7 +1651,7 @@ function buildMeasurementQuestion(topic, min, max) {
     }
     case 'scale-drawings': {
       const scale = pickRandomFromList([20, 50, 100]);
-      const realMeters = randomInt(2, 20);
+      const realMeters = rangeInt(2);
       const drawingCm = (realMeters * 100) / scale;
       return {
         kind: 'measurement',
@@ -1562,6 +1663,94 @@ function buildMeasurementQuestion(topic, min, max) {
     default:
       return {
         kind: 'measurement',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
+  }
+}
+
+function buildTrigonometryQuestion(topic, min, max) {
+  const parsedMin = Number.isFinite(min) ? min : 1;
+  const parsedMax = Number.isFinite(max) ? max : 12;
+  const safeMin = Math.max(1, Math.min(parsedMin, parsedMax));
+  const safeMax = Math.max(safeMin, Math.max(parsedMin, parsedMax));
+  const rangeInt = (minimumValue = 1) => {
+    const low = Math.max(minimumValue, safeMin);
+    const high = Math.max(low, safeMax);
+    return randomInt(low, high);
+  };
+
+  switch (topic) {
+    case 'right-angle-trigonometry': {
+      const angle = randomInt(20, 70);
+      const hypotenuse = rangeInt(2);
+      const opposite = hypotenuse * Math.sin((angle * Math.PI) / 180);
+      return {
+        kind: 'trigonometry',
+        topic,
+        shape: 'right-triangle',
+        dimensions: { angle, hypotenuse },
+        prompt: `Right triangle: hypotenuse ${hypotenuse} cm, angle ${angle}°. Find opposite`,
+        answer: `${formatDecimalResult(opposite)} cm`,
+      };
+    }
+    case 'sine-rule': {
+      const sideA = rangeInt(3);
+      const angleA = randomInt(25, 95);
+      const angleB = randomInt(25, Math.min(95, 170 - angleA));
+      const sideB = sideA * Math.sin((angleB * Math.PI) / 180) / Math.sin((angleA * Math.PI) / 180);
+      return {
+        kind: 'trigonometry',
+        topic,
+        shape: 'sine-rule-triangle',
+        dimensions: { sideA, angleA, angleB },
+        prompt: `In △ABC, a=${sideA} cm, A=${angleA}°, B=${angleB}°. Find b`,
+        answer: `${formatDecimalResult(sideB)} cm`,
+      };
+    }
+    case 'cosine-rule': {
+      const sideB = rangeInt(3);
+      const sideC = rangeInt(3);
+      const angleA = randomInt(30, 120);
+      const sideA = Math.sqrt((sideB ** 2) + (sideC ** 2) - (2 * sideB * sideC * Math.cos((angleA * Math.PI) / 180)));
+      return {
+        kind: 'trigonometry',
+        topic,
+        shape: 'cosine-rule-triangle',
+        dimensions: { sideB, sideC, angleA },
+        prompt: `Sides b=${sideB} cm, c=${sideC} cm, included angle A=${angleA}°. Find a`,
+        answer: `${formatDecimalResult(sideA)} cm`,
+      };
+    }
+    case 'bearings': {
+      const bearingAB = randomInt(1, 359);
+      const bearingBA = ((bearingAB + 180) % 360) || 360;
+      return {
+        kind: 'trigonometry',
+        topic,
+        shape: 'bearings-compass',
+        dimensions: { bearingAB },
+        prompt: `Bearing of B from A is ${String(bearingAB).padStart(3, '0')}°. Find bearing of A from B`,
+        answer: `${String(bearingBA).padStart(3, '0')}°`,
+      };
+    }
+    case 'applications-of-trigonometry': {
+      const ladder = rangeInt(3);
+      const angle = randomInt(20, 75);
+      const height = ladder * Math.sin((angle * Math.PI) / 180);
+      return {
+        kind: 'trigonometry',
+        topic,
+        shape: 'ladder-application',
+        dimensions: { ladderLength: ladder, angle },
+        prompt: `A ${ladder} m ladder makes a ${angle}° angle with the ground. Find vertical height`,
+        answer: `${formatDecimalResult(height)} m`,
+      };
+    }
+    default:
+      return {
+        kind: 'trigonometry',
         topic,
         prompt: 'Write the answer.',
         answer: '',
@@ -2398,6 +2587,26 @@ function getPageInstruction(topic) {
 
   if (topic === 'scale-drawings') {
     return 'Use the scale to find the missing drawing length:';
+  }
+
+  if (topic === 'right-angle-trigonometry') {
+    return 'Use right-angle trigonometry to find the missing value:';
+  }
+
+  if (topic === 'sine-rule') {
+    return 'Use the sine rule to find the missing side:';
+  }
+
+  if (topic === 'cosine-rule') {
+    return 'Use the cosine rule to find the missing side:';
+  }
+
+  if (topic === 'bearings') {
+    return 'Find the required three-figure bearing:';
+  }
+
+  if (topic === 'applications-of-trigonometry') {
+    return 'Use trigonometry to solve each real-world problem:';
   }
 
   if (ALGEBRA_TOPICS.has(topic)) {
