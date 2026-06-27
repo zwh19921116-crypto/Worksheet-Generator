@@ -387,7 +387,7 @@ main {
   min-width: 1rem;
   text-align: right;
   padding-right: 0.12rem;
-  padding-top: 0.28rem;
+  padding-top: calc(0.28rem + 2px);
 }
 
 .long-division-dividend {
