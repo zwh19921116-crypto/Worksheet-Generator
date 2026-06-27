@@ -672,7 +672,16 @@ function renderDecimalQuestion(num, question) {
 }
 
 function renderMeasurementQuestion(num, question) {
-  if (question.topic === 'capacity') {
+  const inlineMeasurementTopics = new Set([
+    'length',
+    'capacity',
+    'mass',
+    'time',
+    'unit-conversions',
+    'scale-drawings',
+  ]);
+
+  if (inlineMeasurementTopics.has(question.topic)) {
     return `
       <div class="question question-number-topic question-measurement-inline">
         <div class="question-number">${num}.</div>
@@ -1501,7 +1510,7 @@ function buildMeasurementQuestion(topic, min, max) {
       return {
         kind: 'measurement',
         topic,
-        prompt: `Convert ${hours} h ${minutes} min to minutes`,
+        prompt: `${hours} h ${minutes} min to minutes`,
         answer: `${hours * 60 + minutes} min`,
       };
     }
@@ -1512,7 +1521,7 @@ function buildMeasurementQuestion(topic, min, max) {
         return {
           kind: 'measurement',
           topic,
-          prompt: `Convert ${cm} cm to m`,
+          prompt: `${cm} cm to m`,
           answer: `${formatDecimalResult(cm / 100)} m`,
         };
       }
@@ -1522,7 +1531,7 @@ function buildMeasurementQuestion(topic, min, max) {
         return {
           kind: 'measurement',
           topic,
-          prompt: `Convert ${grams} g to kg`,
+          prompt: `${grams} g to kg`,
           answer: `${formatDecimalResult(grams / 1000)} kg`,
         };
       }
@@ -1531,7 +1540,7 @@ function buildMeasurementQuestion(topic, min, max) {
       return {
         kind: 'measurement',
         topic,
-        prompt: `Convert ${ml} mL to L`,
+        prompt: `${ml} mL to L`,
         answer: `${formatDecimalResult(ml / 1000)} L`,
       };
     }
