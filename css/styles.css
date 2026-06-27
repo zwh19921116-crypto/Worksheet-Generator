@@ -362,10 +362,10 @@ main {
 
 .long-division {
   width: 100%;
-  max-width: 8.5rem;
+  max-width: 7.2rem;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: auto minmax(4.6rem, 1fr);
+  grid-template-columns: auto minmax(3.6rem, 1fr);
   grid-template-rows: 1.7rem auto;
   column-gap: 0;
   row-gap: 0;
@@ -389,27 +389,27 @@ main {
 .long-division-answer::after {
   content: '';
   display: block;
-  width: 65%;
+  width: 78%;
   border-bottom: 2px solid #2b6cb0;
 }
 
 .long-division-divisor {
   grid-column: 1;
   grid-row: 2;
-  min-width: 1.7rem;
+  min-width: 1.2rem;
   text-align: right;
-  padding-right: 0.55rem;
+  padding-right: 0.22rem;
   padding-bottom: 0.15rem;
 }
 
 .long-division-dividend {
   grid-column: 2;
   grid-row: 2;
-  min-width: 4.6rem;
+  min-width: 3.6rem;
   border-top: 2px solid #2b6cb0;
   border-left: 2px solid #2b6cb0;
   text-align: right;
-  padding: 0.35rem 0 0 0.7rem;
+  padding: 0.28rem 0 0 0.35rem;
 }
 
 /* ---- Page Footer ---- */
