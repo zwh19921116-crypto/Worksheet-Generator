@@ -162,7 +162,7 @@ function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum,
   // Header
   html += `<div class="worksheet-header"><h2>${escapeHtml(title)}</h2>`;
   html += `<div class="worksheet-module">Module: ${escapeHtml(moduleLabel(module))}</div>`;
-  if (includeMeta) {
+  if (includeMeta && pageNum === 1) {
     html += `<div class="meta-fields">
       <span>Name: <span class="meta-field"></span></span>
       <span>Date: <span class="meta-field"></span></span>
