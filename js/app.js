@@ -464,7 +464,6 @@ function renderFractionQuestion(num, question) {
       <div class="question-number">${num}.</div>
       <div class="fraction-topic-body">
         <div class="fraction-topic-prompt">${renderFractionTextHTML(question.prompt)}</div>
-        <div class="fraction-topic-answer-line"></div>
       </div>
     </div>`;
 }
