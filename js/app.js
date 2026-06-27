@@ -15,8 +15,6 @@ const topicSelect      = document.getElementById('topic');
 const timesTableGroup  = document.getElementById('timesTableGroup');
 const rangeRow         = document.getElementById('rangeRow');
 
-const QUESTIONS_PER_PAGE = 20;
-
 const MODULE_TOPICS = {
   arithmetic: [
     { value: 'addition', label: 'Addition (+)' },
@@ -106,14 +104,23 @@ function topicLabel(topic, timesTable) {
 
 function paginateQuestions(questions, title, module, includeMeta) {
   const pages = [];
-  const totalPages = Math.ceil(questions.length / QUESTIONS_PER_PAGE);
+  const questionsPerPage = getQuestionsPerPage(questions);
+  const totalPages = Math.ceil(questions.length / questionsPerPage);
 
   for (let p = 0; p < totalPages; p++) {
-    const slice    = questions.slice(p * QUESTIONS_PER_PAGE, (p + 1) * QUESTIONS_PER_PAGE);
-    const startIdx = p * QUESTIONS_PER_PAGE;
+    const slice    = questions.slice(p * questionsPerPage, (p + 1) * questionsPerPage);
+    const startIdx = p * questionsPerPage;
     pages.push(buildPageHTML(slice, startIdx, title, module, includeMeta, p + 1, totalPages));
   }
   return pages;
+}
+
+function getQuestionsPerPage(questions) {
+  const hasDivision = questions.some((question) => question.operation === 'division');
+  if (hasDivision) {
+    return 8;
+  }
+  return 12;
 }
 
 function showPage(index) {
@@ -131,7 +138,7 @@ function showPage(index) {
 function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum, totalPages) {
   const opSymbol = { addition: '+', subtraction: '−', multiplication: '×', division: '÷' };
 
-  const cols = 4;
+  const cols = 2;
   const rows = Math.ceil(questions.length / cols);
   let html = `<div class="a4-page" style="--q-rows:${rows}">`;
 
