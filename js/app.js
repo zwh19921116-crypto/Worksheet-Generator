@@ -672,6 +672,19 @@ function renderDecimalQuestion(num, question) {
 }
 
 function renderMeasurementQuestion(num, question) {
+  if (question.topic === 'capacity') {
+    return `
+      <div class="question question-number-topic question-measurement-inline">
+        <div class="question-number">${num}.</div>
+        <div class="number-topic-body">
+          <div class="measurement-inline-row">
+            <div class="number-topic-prompt measurement-inline-prompt">${renderMeasurementPromptHTML(question)}</div>
+            <div class="number-topic-answer-line measurement-inline-answer-line"></div>
+          </div>
+        </div>
+      </div>`;
+  }
+
   return `
     <div class="question question-number-topic">
       <div class="question-number">${num}.</div>
@@ -699,7 +712,7 @@ function renderMeasurementPromptHTML(question) {
 }
 
 function renderMeasurementShapeSVG(question) {
-  if ((question.topic !== 'area' && question.topic !== 'perimeter' && question.topic !== 'volume') || !question.shape) {
+  if ((question.topic !== 'area' && question.topic !== 'perimeter' && question.topic !== 'volume' && question.topic !== 'surface-area') || !question.shape) {
     return '';
   }
 
@@ -1458,6 +1471,8 @@ function buildMeasurementQuestion(topic, min, max) {
       return {
         kind: 'measurement',
         topic,
+        shape: 'cube',
+        dimensions: { side },
         prompt: `Cube side length ${side} cm. Find the surface area`,
         answer: `${6 * side * side} cm²`,
       };

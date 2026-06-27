@@ -432,6 +432,29 @@ main {
   border-bottom: 2px solid #2b6cb0;
 }
 
+.question-measurement-inline .number-topic-body {
+  max-width: none;
+  width: 100%;
+}
+
+.measurement-inline-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+}
+
+.measurement-inline-prompt {
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.measurement-inline-answer-line {
+  margin-top: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
 .question-fraction-topic {
   min-height: 100%;
   align-items: flex-start;
