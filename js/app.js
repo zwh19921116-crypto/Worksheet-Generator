@@ -38,6 +38,10 @@ const MODULE_TOPICS = {
     { value: 'multiply-fractions', label: 'Multiply Fractions' },
     { value: 'divide-fractions', label: 'Divide Fractions' },
   ],
+  decimals: [
+    { value: 'decimal-place-value', label: 'Decimal Place Value' },
+    { value: 'decimal-operations', label: 'Decimal Operations' },
+  ],
   number: [
     { value: 'whole-numbers', label: 'Whole Numbers' },
     { value: 'place-value', label: 'Place Value' },
@@ -76,6 +80,11 @@ const FRACTION_TOPICS = new Set([
   'subtract-fractions',
   'multiply-fractions',
   'divide-fractions',
+]);
+
+const DECIMAL_TOPICS = new Set([
+  'decimal-place-value',
+  'decimal-operations',
 ]);
 
 let allPages    = [];
@@ -180,6 +189,7 @@ function moduleLabel(module) {
   const map = {
     arithmetic: 'Arithmetic',
     fractions: 'Fractions',
+    decimals: 'Decimals',
     number: 'Number',
   };
   return map[module] || 'Mathematics';
@@ -213,6 +223,8 @@ function topicLabel(topic, timesTable) {
     'subtract-fractions': 'Subtract Fractions Practice',
     'multiply-fractions': 'Multiply Fractions Practice',
     'divide-fractions': 'Divide Fractions Practice',
+    'decimal-place-value': 'Decimal Place Value Practice',
+    'decimal-operations': 'Decimal Operations Practice',
   };
   return map[topic] || 'Math Practice';
 }
@@ -411,6 +423,10 @@ function renderVerticalQuestion(num, question, symbol) {
     return renderFractionQuestion(num, question);
   }
 
+  if (question.kind === 'decimal') {
+    return renderDecimalQuestion(num, question);
+  }
+
   if (question.operation === 'bodmas') {
     return renderBodmasQuestion(num, question);
   }
@@ -478,11 +494,32 @@ function renderFractionQuestion(num, question) {
     </div>`;
 }
 
+function renderDecimalQuestion(num, question) {
+  if (question.mode === 'operations') {
+    return renderDecimalOperationQuestion(num, question);
+  }
+
+  const promptHTML = renderDecimalPlaceValueHTML(question);
+
+  return `
+    <div class="question question-decimal-topic">
+      <div class="question-number">${num}.</div>
+      <div class="decimal-topic-body">
+        <div class="decimal-topic-prompt">${promptHTML}</div>
+      </div>
+    </div>`;
+}
+
 function renderSolutionHTML(question) {
   if (question.kind !== 'number') {
     if (question.kind === 'fraction') {
       return `${renderFractionTextHTML(question.prompt)} = ${renderFractionTextHTML(String(question.answer))}`;
     }
+
+    if (question.kind === 'decimal') {
+      return `${renderDecimalSolutionText(question)} = ${escapeHtml(String(question.answer))}`;
+    }
+
     return escapeHtml(formatSolution(question));
   }
 
@@ -500,6 +537,13 @@ function renderSolutionHTML(question) {
 function buildQuestions(topic, min, max, count, timesTable) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
+
+  if (DECIMAL_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildDecimalQuestion(topic));
+    }
+    return questions;
+  }
 
   if (FRACTION_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
@@ -694,6 +738,47 @@ function buildFractionQuestion(topic) {
       return {
         kind: 'fraction',
         topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
+  }
+}
+
+function buildDecimalQuestion(topic) {
+  switch (topic) {
+    case 'decimal-place-value': {
+      const wholeDigits = randomInt(1, 3);
+      const decimalDigits = randomInt(2, 3);
+      const digitCount = wholeDigits + decimalDigits;
+      const highlightIndex = randomInt(0, digitCount - 1);
+      const number = buildDecimalNumber(wholeDigits, decimalDigits, highlightIndex);
+      return {
+        kind: 'decimal',
+        topic,
+        mode: 'place-value',
+        number: number.value,
+        highlightIndex,
+        answer: formatDecimalPlaceValue(number.highlightDigit, number.highlightPower),
+      };
+    }
+    case 'decimal-operations': {
+      const operation = ['addition', 'subtraction', 'multiplication', 'division'][randomInt(0, 3)];
+      const question = buildDecimalOperation(operation);
+      return {
+        kind: 'decimal',
+        topic,
+        mode: 'operations',
+        operation,
+        left: question.left,
+        right: question.right,
+        answer: question.answer,
+      };
+    }
+    default:
+      return {
+        kind: 'decimal',
+        topic,
+        mode: 'operations',
         prompt: 'Write the answer.',
         answer: '',
       };
@@ -921,7 +1006,139 @@ function renderFractionTextHTML(value) {
   return parts.join('');
 }
 
+function renderDecimalPlaceValueHTML(question) {
+  return renderHighlightedDecimalHTML(question.number, question.highlightIndex);
+}
+
+function renderDecimalPromptHTML(question) {
+  return escapeHtml(String(question.prompt ?? question.number ?? ''));
+}
+
+function renderDecimalSolutionText(question) {
+  if (question.mode === 'operations') {
+    return formatDecimalOperationText(question);
+  }
+
+  return renderDecimalPromptHTML(question);
+}
+
+function renderDecimalOperationQuestion(num, question) {
+  if (question.operation === 'division') {
+    return `
+      <div class="question question-long-division question-decimal-topic">
+        <div class="question-number">${num}.</div>
+        <div class="long-division decimal-long-division" style="--dividend-ch:${String(question.left).length + 2}">
+          <div class="long-division-answer"></div>
+          <div class="long-division-divisor">${escapeHtml(String(question.right))}</div>
+          <div class="long-division-dividend">${escapeHtml(String(question.left))}</div>
+        </div>
+      </div>`;
+  }
+
+  const symbol = question.operation === 'addition' ? '+' : question.operation === 'subtraction' ? '−' : '×';
+
+  return `
+    <div class="question question-vertical question-decimal-topic">
+      <div class="question-number">${num}.</div>
+      <div class="question-stack decimal-question-stack">
+        <div class="question-top">${escapeHtml(String(question.left))}</div>
+        <div class="question-bottom">
+          <span class="question-operator">${symbol}</span>
+          <span class="question-value">${escapeHtml(String(question.right))}</span>
+        </div>
+        <div class="answer-line"></div>
+      </div>
+    </div>`;
+}
+
+function renderHighlightedDecimalHTML(value, highlightIndex) {
+  const text = String(value);
+  const parts = [];
+  let digitIndex = 0;
+
+  for (const character of text) {
+    if (character === '.') {
+      parts.push('.');
+      continue;
+    }
+
+    const digit = escapeHtml(character);
+    if (digitIndex === highlightIndex) {
+      parts.push(`<span class="decimal-highlight">${digit}</span>`);
+    } else {
+      parts.push(digit);
+    }
+    digitIndex += 1;
+  }
+
+  return parts.join('');
+}
+
+function buildDecimalNumber(wholeDigits, decimalDigits, highlightIndex) {
+  const whole = Array.from({ length: wholeDigits }, (_, index) => (index === 0 ? randomInt(1, 9) : randomInt(0, 9))).join('');
+  const fractional = Array.from({ length: decimalDigits }, () => randomInt(0, 9)).join('');
+  const value = `${whole}.${fractional}`;
+  const plainDigits = `${whole}${fractional}`.split('');
+  const highlightDigit = plainDigits[highlightIndex];
+  const highlightPower = highlightIndex < wholeDigits ? wholeDigits - highlightIndex - 1 : -(highlightIndex - wholeDigits + 1);
+
+  return { value, highlightDigit, highlightPower };
+}
+
+function buildDecimalOperation(operation) {
+  const places = randomInt(1, 2);
+  const left = randomInt(1, 99) / Math.pow(10, places);
+  const right = randomInt(1, 99) / Math.pow(10, places);
+
+  if (operation === 'addition') {
+    return { left: left.toFixed(places), right: right.toFixed(places), answer: formatDecimalResult(left + right) };
+  }
+
+  if (operation === 'subtraction') {
+    const larger = Math.max(left, right);
+    const smaller = Math.min(left, right);
+    return { left: larger.toFixed(places), right: smaller.toFixed(places), answer: formatDecimalResult(larger - smaller) };
+  }
+
+  if (operation === 'multiplication') {
+    return { left: left.toFixed(places), right: right.toFixed(places), answer: formatDecimalResult(left * right) };
+  }
+
+  const divisor = randomInt(2, 9);
+  const quotient = randomInt(1, 99) / 10;
+  const dividend = divisor * quotient;
+  return { left: formatDecimalResult(dividend), right: String(divisor), answer: formatDecimalResult(quotient) };
+}
+
+function formatDecimalOperationText(question) {
+  const operators = {
+    addition: '+',
+    subtraction: '−',
+    multiplication: '×',
+    division: '÷',
+  };
+
+  return `${question.left} ${operators[question.operation]} ${question.right}`;
+}
+
+function formatDecimalResult(value) {
+  return Number(value.toFixed(2)).toString();
+}
+
+function formatDecimalPlaceValue(digit, power) {
+  const numeric = Number(digit) * Math.pow(10, power);
+  return formatDecimalResult(numeric);
+}
+
 function getPageInstruction(topic) {
+  if (topic === 'decimal-place-value') {
+    return 'What is the value of the highlighted digit in the following decimal:';
+  }
+
+  if (topic === 'decimal-operations') {
+    return 'Calculate the following decimal operations:';
+  }
+
   if (topic === 'whole-numbers') {
     return 'Write the following in words:';
   }
