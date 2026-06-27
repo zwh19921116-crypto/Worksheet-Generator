@@ -1139,31 +1139,53 @@ function buildGeometryQuestions(topic, count) {
   }
 
   const source = topic === '2d-shapes' ? get2dShapeFacts() : get3dShapeFacts();
-  const promptTypes = topic === '2d-shapes' ? ['sides', 'vertices', 'symmetry'] : ['faces', 'edges', 'vertices'];
   const shuffled = source.slice().sort(() => Math.random() - 0.5);
   const items = [];
+  let lastPromptType = '';
+
+  const promptVariants2d = {
+    sides: ['number of sides', 'how many sides', 'sides'],
+    corners: ['number of corners', 'how many corners', 'corners'],
+    vertices: ['number of vertices', 'how many vertices', 'vertices'],
+    symmetry: ['number of lines of symmetry', 'how many lines of symmetry', 'line(s) of symmetry'],
+  };
+
+  const promptVariants3d = {
+    faces: ['number of faces', 'how many faces', 'faces'],
+    edges: ['number of edges', 'how many edges', 'edges'],
+    vertices: ['number of vertices', 'how many vertices', 'vertices'],
+  };
 
   for (let i = 0; i < count; i++) {
     const shape = shuffled[i % shuffled.length];
-    const promptType = promptTypes[i % promptTypes.length];
 
     if (topic === '2d-shapes') {
+      const availableTypes = ['sides', 'corners', 'vertices', 'symmetry'].filter((type) => type !== lastPromptType);
+      const promptType = pickRandomFromList(availableTypes);
+      const wording = pickRandomFromList(promptVariants2d[promptType]);
+      lastPromptType = promptType;
+
       if (promptType === 'sides') {
-        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of sides`, answer: shape.sides });
-      } else if (promptType === 'vertices') {
-        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of vertices`, answer: shape.vertices });
+        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: ${wording}`, answer: shape.sides });
+      } else if (promptType === 'corners' || promptType === 'vertices') {
+        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: ${wording}`, answer: shape.vertices });
       } else {
-        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: line(s) of symmetry`, answer: shape.symmetry });
+        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: ${wording}`, answer: shape.symmetry });
       }
       continue;
     }
 
+    const availableTypes = ['faces', 'edges', 'vertices'].filter((type) => type !== lastPromptType);
+    const promptType = pickRandomFromList(availableTypes);
+    const wording = pickRandomFromList(promptVariants3d[promptType]);
+    lastPromptType = promptType;
+
     if (promptType === 'faces') {
-      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of faces`, answer: shape.faces });
+      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: ${wording}`, answer: shape.faces });
     } else if (promptType === 'edges') {
-      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of edges`, answer: shape.edges });
+      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: ${wording}`, answer: shape.edges });
     } else {
-      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of vertices`, answer: shape.vertices });
+      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: ${wording}`, answer: shape.vertices });
     }
   }
 
