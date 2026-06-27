@@ -151,8 +151,7 @@ function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum,
   html += `<div class="questions-grid">`;
   questions.forEach((q, idx) => {
     const num    = startIdx + idx + 1;
-    const symbol = opSymbol[q.operation];
-    html += `<div class="question">${num}.&nbsp; ${q.a} ${symbol} ${q.b} = <span class="answer-line"></span></div>`;
+    html += renderVerticalQuestion(num, q, opSymbol[q.operation]);
   });
   html += `</div>`;
 
@@ -163,6 +162,21 @@ function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum,
 
   html += `</div>`;
   return html;
+}
+
+function renderVerticalQuestion(num, question, symbol) {
+  return `
+    <div class="question question-vertical">
+      <div class="question-number">${num}.</div>
+      <div class="question-stack">
+        <div class="question-top">${question.a}</div>
+        <div class="question-bottom">
+          <span class="question-operator">${symbol}</span>
+          <span class="question-value">${question.b}</span>
+        </div>
+        <div class="answer-line"></div>
+      </div>
+    </div>`;
 }
 
 function buildQuestions(topic, min, max, count, timesTable) {
