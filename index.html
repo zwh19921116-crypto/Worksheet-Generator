@@ -58,9 +58,18 @@
       </div>
     </section>
 
-    <section class="preview" id="worksheetPreview">
-      <p class="placeholder">Your worksheet will appear here after you click <strong>Generate Worksheet</strong>.</p>
-    </section>
+    <div class="preview-wrapper">
+      <!-- Pagination controls -->
+      <div class="pagination" id="pagination" style="display:none">
+        <button id="prevBtn" class="btn-page" disabled>&#8592; Prev</button>
+        <span id="pageIndicator">Page 1 of 1</span>
+        <button id="nextBtn" class="btn-page">Next &#8594;</button>
+      </div>
+
+      <section class="preview" id="worksheetPreview">
+        <p class="placeholder">Your worksheet will appear here after you click <strong>Generate Worksheet</strong>.</p>
+      </section>
+    </div>
   </main>
 
   <script src="js/app.js"></script>

@@ -148,13 +148,58 @@ main {
   cursor: not-allowed;
 }
 
+/* ---- Preview Wrapper & Pagination ---- */
+.preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.btn-page {
+  background: #2b6cb0;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+  background: #2c5282;
+}
+
+.btn-page:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* ---- Preview Panel ---- */
 .preview {
-  background: #fff;
+  background: #e2e8f0;
   border-radius: 10px;
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   min-height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .placeholder {
@@ -164,70 +209,109 @@ main {
   margin-top: 4rem;
 }
 
-/* ---- Worksheet Output ---- */
-.worksheet {
+/* ---- A4 Page ---- */
+.a4-page {
+  background: #fff;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 15mm 18mm;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
+/* ---- Worksheet Header ---- */
 .worksheet-header {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 8mm;
 }
 
 .worksheet-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
+  color: #1a202c;
 }
 
 .meta-fields {
   display: flex;
   justify-content: space-between;
-  margin-top: 0.75rem;
-  font-size: 0.95rem;
+  margin-top: 5mm;
+  font-size: 0.9rem;
   color: #4a5568;
+  gap: 1rem;
 }
 
 .meta-field {
+  display: inline-block;
   border-bottom: 1.5px solid #4a5568;
-  min-width: 180px;
+  min-width: 120px;
   padding-bottom: 2px;
 }
 
+/* ---- Questions Grid ---- */
 .questions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1.25rem 1rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5mm 6mm;
+  margin-top: 6mm;
+  flex: 1;
 }
 
 .question {
   background: #f7fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  font-size: 1.1rem;
+  border-radius: 6px;
+  padding: 4mm 5mm;
+  font-size: 1rem;
   text-align: center;
-  min-height: 60px;
+  min-height: 14mm;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.25rem;
 }
 
 .answer-line {
   display: inline-block;
   border-bottom: 2px solid #2b6cb0;
-  min-width: 48px;
-  margin-left: 0.25rem;
+  min-width: 32px;
+}
+
+/* ---- Page Footer ---- */
+.page-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #a0aec0;
+  margin-top: auto;
+  padding-top: 6mm;
 }
 
 /* ---- Print Styles ---- */
 @media print {
   body { background: #fff; }
-  header, .controls { display: none; }
+  header, .controls, .pagination, .button-group { display: none !important; }
   main { display: block; margin: 0; padding: 0; }
-  .preview {
+  .preview-wrapper { gap: 0; }
+  .preview { background: none; padding: 0; box-shadow: none; display: block; }
+
+  .a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm 18mm;
     box-shadow: none;
-    padding: 0;
+    page-break-after: always;
+    break-after: page;
   }
-  .worksheet-header h2 { font-size: 1.8rem; }
+
+  .a4-page:last-child {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 0;
 }
