@@ -47,6 +47,10 @@ const MODULE_TOPICS = {
     { value: 'percentage-decrease', label: 'Percentage Decrease' },
     { value: 'percentage-to-decimal', label: 'Converting Percentage to Decimal' },
   ],
+  geometry: [
+    { value: '2d-shapes', label: '2D Shapes' },
+    { value: '3d-shapes', label: '3D Shapes' },
+  ],
   algebra: [
     { value: 'patterns', label: 'Patterns' },
     { value: 'variables', label: 'Variables' },
@@ -112,6 +116,11 @@ const PERCENTAGE_TOPICS = new Set([
   'percentage-increase',
   'percentage-decrease',
   'percentage-to-decimal',
+]);
+
+const GEOMETRY_TOPICS = new Set([
+  '2d-shapes',
+  '3d-shapes',
 ]);
 
 const ALGEBRA_TOPICS = new Set([
@@ -235,6 +244,7 @@ function moduleLabel(module) {
     fractions: 'Fractions',
     decimals: 'Decimals',
     percentages: 'Percentages',
+    geometry: 'Geometry',
     algebra: 'Algebra',
     number: 'Number',
   };
@@ -274,6 +284,8 @@ function topicLabel(topic, timesTable) {
     'percentage-increase': 'Percentage Increase Practice',
     'percentage-decrease': 'Percentage Decrease Practice',
     'percentage-to-decimal': 'Percentage to Decimal Practice',
+    '2d-shapes': '2D Shapes Practice',
+    '3d-shapes': '3D Shapes Practice',
     patterns: 'Patterns Practice',
     variables: 'Variables Practice',
     expressions: 'Expressions Practice',
@@ -486,6 +498,10 @@ function renderVerticalQuestion(num, question, symbol) {
     return renderFractionQuestion(num, question);
   }
 
+  if (question.kind === 'geometry') {
+    return renderGeometryQuestion(num, question);
+  }
+
   if (question.kind === 'algebra') {
     return renderAlgebraQuestion(num, question);
   }
@@ -587,6 +603,10 @@ function renderSolutionHTML(question) {
       return `${renderFractionTextHTML(question.prompt)} = ${renderFractionTextHTML(String(question.answer))}`;
     }
 
+    if (question.kind === 'geometry') {
+      return `${renderGeometryPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
+    }
+
     if (question.kind === 'algebra') {
       return `${renderAlgebraPromptHTML(question)} = ${renderAlgebraTextHTML(String(question.answer))}`;
     }
@@ -616,6 +636,13 @@ function renderSolutionHTML(question) {
 function buildQuestions(topic, min, max, count, timesTable) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
+
+  if (GEOMETRY_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildGeometryQuestion(topic));
+    }
+    return questions;
+  }
 
   if (ALGEBRA_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
@@ -917,6 +944,43 @@ function buildPercentageQuestion(topic) {
         answer: '',
       };
   }
+}
+
+function buildGeometryQuestion(topic) {
+  if (topic === '2d-shapes') {
+    const shapes2d = [
+      { name: 'Triangle', answer: '3 sides, 3 vertices' },
+      { name: 'Square', answer: '4 sides, 4 vertices' },
+      { name: 'Rectangle', answer: '4 sides, 4 vertices' },
+      { name: 'Pentagon', answer: '5 sides, 5 vertices' },
+      { name: 'Hexagon', answer: '6 sides, 6 vertices' },
+      { name: 'Octagon', answer: '8 sides, 8 vertices' },
+    ];
+    const shape = pickRandomFromList(shapes2d);
+    return {
+      kind: 'geometry',
+      topic,
+      prompt: shape.name,
+      answer: shape.answer,
+    };
+  }
+
+  const shapes3d = [
+    { name: 'Cube', answer: '6 faces, 12 edges, 8 vertices' },
+    { name: 'Cuboid', answer: '6 faces, 12 edges, 8 vertices' },
+    { name: 'Triangular Prism', answer: '5 faces, 9 edges, 6 vertices' },
+    { name: 'Square Pyramid', answer: '5 faces, 8 edges, 5 vertices' },
+    { name: 'Cylinder', answer: '3 faces, 2 edges, 0 vertices' },
+    { name: 'Cone', answer: '2 faces, 1 edge, 1 vertex' },
+    { name: 'Sphere', answer: '1 curved face, 0 edges, 0 vertices' },
+  ];
+  const shape = pickRandomFromList(shapes3d);
+  return {
+    kind: 'geometry',
+    topic,
+    prompt: shape.name,
+    answer: shape.answer,
+  };
 }
 
 function buildAlgebraQuestion(topic) {
@@ -1338,12 +1402,27 @@ function renderAlgebraQuestion(num, question) {
     </div>`;
 }
 
+function renderGeometryQuestion(num, question) {
+  return `
+    <div class="question question-geometry-topic">
+      <div class="question-number">${num}.</div>
+      <div class="geometry-topic-body">
+        <div class="geometry-topic-prompt">${renderGeometryPromptHTML(question)}</div>
+        <div class="geometry-topic-answer-line"></div>
+      </div>
+    </div>`;
+}
+
 function renderPercentagePromptHTML(question) {
   return escapeHtml(String(question.prompt ?? ''));
 }
 
 function renderAlgebraPromptHTML(question) {
   return renderAlgebraTextHTML(String(question.prompt ?? '')).replace(/\n/g, '<br>');
+}
+
+function renderGeometryPromptHTML(question) {
+  return escapeHtml(String(question.prompt ?? ''));
 }
 
 function renderAlgebraTextHTML(text) {
@@ -1494,6 +1573,14 @@ function getPageInstruction(topic) {
 
   if (topic === 'percentage-to-decimal') {
     return 'Convert the following percentages to decimals:';
+  }
+
+  if (topic === '2d-shapes') {
+    return 'Write the number of sides and vertices for each 2D shape:';
+  }
+
+  if (topic === '3d-shapes') {
+    return 'Write the number of faces, edges and vertices for each 3D shape:';
   }
 
   if (ALGEBRA_TOPICS.has(topic)) {
