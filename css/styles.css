@@ -358,12 +358,13 @@ main {
 
 .question-long-division {
   min-height: 100%;
+  justify-content: flex-start;
 }
 
 .long-division {
   width: 100%;
   max-width: 6.2rem;
-  margin: 0 auto;
+  margin: 0 0 0 1.3rem;
   display: grid;
   grid-template-columns: auto minmax(3rem, 1fr);
   grid-template-rows: auto;
