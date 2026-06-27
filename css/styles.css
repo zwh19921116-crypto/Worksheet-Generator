@@ -397,7 +397,8 @@ main {
   border-top: 2px solid #2b6cb0;
   border-left: 2px solid #2b6cb0;
   text-align: left;
-  padding: 0.18rem 0.3rem 0 0.22rem;
+  min-height: 1.45em;
+  padding: 0.28rem 0.3rem 0 0.22rem;
 }
 
 /* ---- Page Footer ---- */
