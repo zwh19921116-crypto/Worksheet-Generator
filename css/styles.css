@@ -546,8 +546,8 @@ main {
 }
 
 .geometry-shape-icon {
-  width: 3.2rem;
-  height: 3.2rem;
+  width: 5rem;
+  height: 5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -565,8 +565,8 @@ main {
 }
 
 .geometry-topic-large-shape .geometry-shape-icon {
-  width: 4.8rem;
-  height: 4.8rem;
+  width: 8rem;
+  height: 8rem;
 }
 
 .geometry-topic-large-shape .geometry-shape-question {
