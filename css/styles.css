@@ -356,6 +356,49 @@ main {
   min-height: 1.75rem;
 }
 
+.question-long-division {
+  min-height: 100%;
+}
+
+.long-division {
+  width: 100%;
+  max-width: 9rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 1.7rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.long-division-divisor {
+  min-width: 1.8rem;
+  text-align: right;
+  padding-right: 0.45rem;
+  padding-bottom: 0.35rem;
+}
+
+.long-division-work {
+  min-width: 4.8rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-left: 2px solid #2b6cb0;
+}
+
+.long-division-answer {
+  min-height: 1.6rem;
+  border-top: 2px solid #2b6cb0;
+}
+
+.long-division-dividend {
+  text-align: right;
+  padding: 0.25rem 0 0 0.6rem;
+}
+
 /* ---- Page Footer ---- */
 .page-footer {
   text-align: center;
