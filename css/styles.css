@@ -400,6 +400,38 @@ main {
   border-bottom: 2px solid #2b6cb0;
 }
 
+.question-number-topic {
+  min-height: 100%;
+  align-items: flex-start;
+}
+
+.number-topic-body {
+  margin: 1rem auto 0;
+  width: 100%;
+  max-width: 8.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.number-topic-prompt {
+  font-size: 1rem;
+  line-height: 1.35;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.number-topic-prompt sup {
+  font-size: 0.75em;
+}
+
+.number-topic-answer-line {
+  width: 100%;
+  min-height: 1.8rem;
+  margin-top: 0.85rem;
+  border-bottom: 2px solid #2b6cb0;
+}
+
 .long-division {
   width: max-content;
   max-width: none;

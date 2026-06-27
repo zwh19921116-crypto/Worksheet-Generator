@@ -28,7 +28,34 @@ const MODULE_TOPICS = {
     { value: 'bodmas', label: 'B.O.D.M.A.S' },
     { value: 'mixed', label: 'Mixed Operations' },
   ],
+  number: [
+    { value: 'whole-numbers', label: 'Whole Numbers' },
+    { value: 'place-value', label: 'Place Value' },
+    { value: 'ordering-numbers', label: 'Ordering Numbers' },
+    { value: 'factors', label: 'Factors' },
+    { value: 'multiples', label: 'Multiples' },
+    { value: 'prime-numbers', label: 'Prime Numbers' },
+    { value: 'composite-numbers', label: 'Composite Numbers' },
+    { value: 'integers', label: 'Integers' },
+    { value: 'indices', label: 'Indices' },
+    { value: 'scientific-notation', label: 'Scientific Notation' },
+    { value: 'surds', label: 'Surds' },
+  ],
 };
+
+const NUMBER_TOPICS = new Set([
+  'whole-numbers',
+  'place-value',
+  'ordering-numbers',
+  'factors',
+  'multiples',
+  'prime-numbers',
+  'composite-numbers',
+  'integers',
+  'indices',
+  'scientific-notation',
+  'surds',
+]);
 
 let allPages    = [];
 let currentPage = 0;
@@ -131,6 +158,7 @@ function renderWorksheetPages(questions) {
 function moduleLabel(module) {
   const map = {
     arithmetic: 'Arithmetic',
+    number: 'Number',
   };
   return map[module] || 'Mathematics';
 }
@@ -144,6 +172,17 @@ function topicLabel(topic, timesTable) {
     'times-tables': `${timesTable} Times Table`,
     bodmas: 'B.O.D.M.A.S Practice',
     mixed: 'Mixed Operations Practice',
+    'whole-numbers': 'Whole Numbers Practice',
+    'place-value': 'Place Value Practice',
+    'ordering-numbers': 'Ordering Numbers Practice',
+    factors: 'Factors Practice',
+    multiples: 'Multiples Practice',
+    'prime-numbers': 'Prime Numbers Practice',
+    'composite-numbers': 'Composite Numbers Practice',
+    integers: 'Integers Practice',
+    indices: 'Indices Practice',
+    'scientific-notation': 'Scientific Notation Practice',
+    surds: 'Surds Practice',
   };
   return map[topic] || 'Math Practice';
 }
@@ -201,9 +240,14 @@ function paginateQuestions(questions, title, module, includeSolutions) {
 function getQuestionsPerPage(questions) {
   const multiplicationOnly = questions.length > 0 && questions.every((question) => question.operation === 'multiplication');
   const bodmasOnly = questions.length > 0 && questions.every((question) => question.operation === 'bodmas');
+  const numberOnly = questions.length > 0 && questions.every((question) => question.kind === 'number');
   const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
 
   if (bodmasOnly) {
+    return 8;
+  }
+
+  if (numberOnly) {
     return 8;
   }
 
@@ -289,6 +333,10 @@ function buildSolutionsPageHTML(questions, startIdx, title, module, pageNum, tot
 }
 
 function formatSolution(question) {
+  if (question.kind === 'number') {
+    return `${question.prompt} = ${question.answer}`;
+  }
+
   switch (question.operation) {
     case 'addition':
       return `${question.a} + ${question.b} = ${question.a + question.b}`;
@@ -306,6 +354,10 @@ function formatSolution(question) {
 }
 
 function renderVerticalQuestion(num, question, symbol) {
+  if (question.kind === 'number') {
+    return renderNumberQuestion(num, question);
+  }
+
   if (question.operation === 'bodmas') {
     return renderBodmasQuestion(num, question);
   }
@@ -352,9 +404,27 @@ function renderBodmasQuestion(num, question) {
     </div>`;
 }
 
+function renderNumberQuestion(num, question) {
+  return `
+    <div class="question question-number-topic">
+      <div class="question-number">${num}.</div>
+      <div class="number-topic-body">
+        <div class="number-topic-prompt">${escapeHtml(question.prompt)}</div>
+        <div class="number-topic-answer-line"></div>
+      </div>
+    </div>`;
+}
+
 function buildQuestions(topic, min, max, count, timesTable) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
+
+  if (NUMBER_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildNumberQuestion(topic, min, max));
+    }
+    return questions;
+  }
 
   for (let i = 0; i < count; i++) {
     let operation, a, b;
@@ -442,6 +512,215 @@ function buildBodmasQuestion(min, max) {
     }
   }
 }
+
+function buildNumberQuestion(topic, min, max) {
+  switch (topic) {
+    case 'whole-numbers': {
+      const value = randomInt(100, 9999);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Write ${value} in words.`,
+        answer: numberToWords(value),
+      };
+    }
+    case 'place-value': {
+      const value = randomInt(100, 99999);
+      const digits = String(value).split('');
+      const index = randomInt(0, digits.length - 1);
+      const digit = digits[index];
+      const placeValue = Number(digit) * Math.pow(10, digits.length - index - 1);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `What is the value of the ${digit} in ${value}?`,
+        answer: placeValue,
+      };
+    }
+    case 'ordering-numbers': {
+      const values = uniqueRandomValues(4, min, max);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Order these numbers from smallest to largest: ${values.join(', ')}`,
+        answer: values.slice().sort((a, b) => a - b).join(', '),
+      };
+    }
+    case 'factors': {
+      const value = randomInt(12, 144);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `List all the factors of ${value}.`,
+        answer: getFactors(value).join(', '),
+      };
+    }
+    case 'multiples': {
+      const value = randomInt(2, 12);
+      const countLimit = 5;
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Write the first ${countLimit} multiples of ${value}.`,
+        answer: Array.from({ length: countLimit }, (_, index) => value * (index + 1)).join(', '),
+      };
+    }
+    case 'prime-numbers': {
+      const value = pickRandomFromList(PRIME_NUMBERS);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Is ${value} a prime number?`,
+        answer: 'Yes',
+      };
+    }
+    case 'composite-numbers': {
+      const value = pickRandomFromList(COMPOSITE_NUMBERS);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Is ${value} a composite number?`,
+        answer: 'Yes',
+      };
+    }
+    case 'integers': {
+      const values = uniqueRandomValues(4, -20, 20);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Order these integers from least to greatest: ${values.join(', ')}`,
+        answer: values.slice().sort((a, b) => a - b).join(', '),
+      };
+    }
+    case 'indices': {
+      const base = randomInt(2, 9);
+      const exponent = randomInt(2, 4);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Evaluate ${base}^${exponent}.`,
+        answer: Math.pow(base, exponent),
+      };
+    }
+    case 'scientific-notation': {
+      const value = randomInt(1000, 9999999);
+      const scientific = toScientificNotation(value);
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Write ${value} in scientific notation.`,
+        answer: scientific,
+      };
+    }
+    case 'surds': {
+      const rootFactor = randomInt(2, 9);
+      const radicand = pickNonSquareRadicand();
+      return {
+        kind: 'number',
+        topic,
+        prompt: `Simplify √(${rootFactor * rootFactor * radicand}).`,
+        answer: `${rootFactor}√${radicand}`,
+      };
+    }
+    default:
+      return {
+        kind: 'number',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
+  }
+}
+
+function getFactors(value) {
+  const factors = [];
+  for (let i = 1; i <= value; i++) {
+    if (value % i === 0) {
+      factors.push(i);
+    }
+  }
+  return factors;
+}
+
+function uniqueRandomValues(count, min, max) {
+  const values = new Set();
+  while (values.size < count) {
+    values.add(randomInt(min, max));
+  }
+  return Array.from(values);
+}
+
+function pickRandomFromList(list) {
+  return list[randomInt(0, list.length - 1)];
+}
+
+function isPrime(value) {
+  if (value < 2) return false;
+  for (let i = 2; i * i <= value; i++) {
+    if (value % i === 0) return false;
+  }
+  return true;
+}
+
+function pickNonSquareRadicand() {
+  const options = [2, 3, 5, 6, 7, 10, 11, 13];
+  return options[randomInt(0, options.length - 1)];
+}
+
+function toScientificNotation(value) {
+  const exponent = String(value).length - 1;
+  const mantissa = (value / Math.pow(10, exponent)).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+  return `${mantissa} × 10^${exponent}`;
+}
+
+function numberToWords(value) {
+  const ones = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+  const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+
+  if (value < 10) return ones[value];
+  if (value < 20) return teens[value - 10];
+  if (value < 100) {
+    const tensPart = tens[Math.floor(value / 10)];
+    const onesPart = value % 10;
+    return onesPart === 0 ? tensPart : `${tensPart}-${ones[onesPart]}`;
+  }
+
+  if (value < 1000) {
+    const hundredsPart = Math.floor(value / 100);
+    const remainder = value % 100;
+    return remainder === 0 ? `${ones[hundredsPart]} hundred` : `${ones[hundredsPart]} hundred and ${numberToWords(remainder)}`;
+  }
+
+  if (value < 10000) {
+    const thousandsPart = Math.floor(value / 1000);
+    const remainder = value % 1000;
+    if (remainder === 0) {
+      return `${numberToWords(thousandsPart)} thousand`;
+    }
+    const remainderWords = remainder < 100 ? numberToWords(remainder) : numberToWords(remainder);
+    return `${numberToWords(thousandsPart)} thousand ${remainderWords}`;
+  }
+
+  return String(value);
+}
+
+const PRIME_NUMBERS = [
+  2, 3, 5, 7, 11, 13, 17, 19, 23, 29,
+  31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+  73, 79, 83, 89, 97,
+];
+
+const COMPOSITE_NUMBERS = [
+  4, 6, 8, 9, 10, 12, 14, 15, 16, 18,
+  20, 21, 22, 24, 25, 26, 27, 28, 30, 32,
+  33, 34, 35, 36, 38, 39, 40, 42, 44, 45,
+  46, 48, 49, 50, 51, 52, 54, 55, 56, 57,
+  58, 60, 62, 63, 64, 65, 66, 68, 69, 70,
+  72, 74, 75, 76, 77, 78, 80, 81, 82, 84,
+  85, 86, 87, 88, 90, 91, 92, 93, 94, 95,
+  96, 98, 99,
+];
 
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
