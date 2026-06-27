@@ -42,6 +42,11 @@ const MODULE_TOPICS = {
     { value: 'decimal-place-value', label: 'Decimal Place Value' },
     { value: 'decimal-operations', label: 'Decimal Operations' },
   ],
+  percentages: [
+    { value: 'percentage-increase', label: 'Percentage Increase' },
+    { value: 'percentage-decrease', label: 'Percentage Decrease' },
+    { value: 'percentage-to-decimal', label: 'Converting Percentage to Decimal' },
+  ],
   number: [
     { value: 'whole-numbers', label: 'Whole Numbers' },
     { value: 'place-value', label: 'Place Value' },
@@ -85,6 +90,12 @@ const FRACTION_TOPICS = new Set([
 const DECIMAL_TOPICS = new Set([
   'decimal-place-value',
   'decimal-operations',
+]);
+
+const PERCENTAGE_TOPICS = new Set([
+  'percentage-increase',
+  'percentage-decrease',
+  'percentage-to-decimal',
 ]);
 
 let allPages    = [];
@@ -190,6 +201,7 @@ function moduleLabel(module) {
     arithmetic: 'Arithmetic',
     fractions: 'Fractions',
     decimals: 'Decimals',
+    percentages: 'Percentages',
     number: 'Number',
   };
   return map[module] || 'Mathematics';
@@ -225,6 +237,9 @@ function topicLabel(topic, timesTable) {
     'divide-fractions': 'Divide Fractions Practice',
     'decimal-place-value': 'Decimal Place Value Practice',
     'decimal-operations': 'Decimal Operations Practice',
+    'percentage-increase': 'Percentage Increase Practice',
+    'percentage-decrease': 'Percentage Decrease Practice',
+    'percentage-to-decimal': 'Percentage to Decimal Practice',
   };
   return map[topic] || 'Math Practice';
 }
@@ -423,6 +438,10 @@ function renderVerticalQuestion(num, question, symbol) {
     return renderFractionQuestion(num, question);
   }
 
+  if (question.kind === 'percentage') {
+    return renderPercentageQuestion(num, question);
+  }
+
   if (question.kind === 'decimal') {
     return renderDecimalQuestion(num, question);
   }
@@ -516,6 +535,10 @@ function renderSolutionHTML(question) {
       return `${renderFractionTextHTML(question.prompt)} = ${renderFractionTextHTML(String(question.answer))}`;
     }
 
+    if (question.kind === 'percentage') {
+      return `${renderPercentagePromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
+    }
+
     if (question.kind === 'decimal') {
       return `${renderDecimalSolutionText(question)} = ${escapeHtml(String(question.answer))}`;
     }
@@ -537,6 +560,13 @@ function renderSolutionHTML(question) {
 function buildQuestions(topic, min, max, count, timesTable) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
+
+  if (PERCENTAGE_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildPercentageQuestion(topic));
+    }
+    return questions;
+  }
 
   if (DECIMAL_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
@@ -785,6 +815,47 @@ function buildDecimalQuestion(topic) {
   }
 }
 
+function buildPercentageQuestion(topic) {
+  switch (topic) {
+    case 'percentage-increase': {
+      const base = randomInt(2, 20) * 20;
+      const percent = randomInt(1, 10) * 5;
+      return {
+        kind: 'percentage',
+        topic,
+        prompt: `Increase ${base} by ${percent}%`,
+        answer: formatPercentageChange(base, percent, 1),
+      };
+    }
+    case 'percentage-decrease': {
+      const base = randomInt(2, 20) * 20;
+      const percent = randomInt(1, 10) * 5;
+      return {
+        kind: 'percentage',
+        topic,
+        prompt: `Decrease ${base} by ${percent}%`,
+        answer: formatPercentageChange(base, percent, -1),
+      };
+    }
+    case 'percentage-to-decimal': {
+      const percent = randomInt(5, 100);
+      return {
+        kind: 'percentage',
+        topic,
+        prompt: `${percent}%`,
+        answer: formatPercentageToDecimal(percent),
+      };
+    }
+    default:
+      return {
+        kind: 'percentage',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
+  }
+}
+
 function buildNumberQuestion(topic, min, max) {
   switch (topic) {
     case 'whole-numbers': {
@@ -1014,6 +1085,21 @@ function renderDecimalPromptHTML(question) {
   return escapeHtml(String(question.prompt ?? question.number ?? ''));
 }
 
+function renderPercentageQuestion(num, question) {
+  return `
+    <div class="question question-percentage-topic">
+      <div class="question-number">${num}.</div>
+      <div class="percentage-topic-body">
+        <div class="percentage-topic-prompt">${renderPercentagePromptHTML(question)}</div>
+        <div class="percentage-topic-answer-line"></div>
+      </div>
+    </div>`;
+}
+
+function renderPercentagePromptHTML(question) {
+  return escapeHtml(String(question.prompt ?? ''));
+}
+
 function renderDecimalSolutionText(question) {
   if (question.mode === 'operations') {
     return formatDecimalOperationText(question);
@@ -1130,6 +1216,15 @@ function formatDecimalPlaceValue(digit, power) {
   return formatDecimalResult(numeric);
 }
 
+function formatPercentageToDecimal(percent) {
+  return formatDecimalResult(percent / 100);
+}
+
+function formatPercentageChange(base, percent, direction) {
+  const change = base * (percent / 100);
+  return formatDecimalResult(direction === 1 ? base + change : base - change);
+}
+
 function getPageInstruction(topic) {
   if (topic === 'decimal-place-value') {
     return 'What is the value of the highlighted digit in the following decimal:';
@@ -1137,6 +1232,18 @@ function getPageInstruction(topic) {
 
   if (topic === 'decimal-operations') {
     return 'Calculate the following decimal operations:';
+  }
+
+  if (topic === 'percentage-increase') {
+    return 'Calculate the percentage increase:';
+  }
+
+  if (topic === 'percentage-decrease') {
+    return 'Calculate the percentage decrease:';
+  }
+
+  if (topic === 'percentage-to-decimal') {
+    return 'Convert the following percentages to decimals:';
   }
 
   if (topic === 'whole-numbers') {
