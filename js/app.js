@@ -137,6 +137,13 @@ function paginateQuestions(questions, title, module, includeMeta) {
 }
 
 function getQuestionsPerPage(questions) {
+  const multiplicationOnly = questions.length > 0 && questions.every((question) => question.operation === 'multiplication');
+  const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
+
+  if (multiplicationOnly && hasDoubleDigitByDoubleDigit) {
+    return 6;
+  }
+
   return 10;
 }
 
