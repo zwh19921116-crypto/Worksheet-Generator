@@ -18,11 +18,6 @@ const rangeRow         = document.getElementById('rangeRow');
 const QUESTIONS_PER_PAGE = 20;
 
 const MODULE_TOPICS = {
-  number: [
-    { value: 'place-value', label: 'Place Value' },
-    { value: 'number-bonds', label: 'Number Bonds' },
-    { value: 'comparing-numbers', label: 'Comparing Numbers' },
-  ],
   arithmetic: [
     { value: 'addition', label: 'Addition (+)' },
     { value: 'subtraction', label: 'Subtraction (−)' },
@@ -31,33 +26,7 @@ const MODULE_TOPICS = {
     { value: 'times-tables', label: 'Times Tables' },
     { value: 'mixed', label: 'Mixed Operations' },
   ],
-  algebra: [
-    { value: 'patterns', label: 'Patterns' },
-    { value: 'simple-equations', label: 'Simple Equations' },
-  ],
-  geometry: [
-    { value: 'shapes', label: '2D and 3D Shapes' },
-    { value: 'angles', label: 'Angles' },
-  ],
-  measurement: [
-    { value: 'length', label: 'Length' },
-    { value: 'time', label: 'Time' },
-    { value: 'mass', label: 'Mass and Capacity' },
-  ],
-  statistics: [
-    { value: 'tally', label: 'Tally Charts' },
-    { value: 'graphs', label: 'Bar Graphs' },
-  ],
 };
-
-const IMPLEMENTED_TOPICS = new Set([
-  'addition',
-  'subtraction',
-  'multiplication',
-  'division',
-  'times-tables',
-  'mixed',
-]);
 
 let allPages    = [];
 let currentPage = 0;
@@ -104,11 +73,6 @@ function generateWorksheet() {
   const title       = document.getElementById('title').value.trim() || topicLabel(topic, timesTable);
   const includeMeta = document.getElementById('studentName').checked;
 
-  if (!IMPLEMENTED_TOPICS.has(topic)) {
-    alert('This topic is not implemented yet. For now, only Arithmetic topics generate worksheets.');
-    return;
-  }
-
   if (topic !== 'times-tables' && minNum > maxNum) {
     alert('Min Number cannot be greater than Max Number.');
     return;
@@ -123,12 +87,7 @@ function generateWorksheet() {
 
 function moduleLabel(module) {
   const map = {
-    number: 'Number',
     arithmetic: 'Arithmetic',
-    algebra: 'Algebra',
-    geometry: 'Geometry',
-    measurement: 'Measurement',
-    statistics: 'Statistics',
   };
   return map[module] || 'Mathematics';
 }
