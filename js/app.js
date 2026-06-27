@@ -473,7 +473,7 @@ function renderFractionQuestion(num, question) {
     <div class="question question-fraction-topic">
       <div class="question-number">${num}.</div>
       <div class="fraction-topic-body">
-        <div class="fraction-topic-prompt">${renderFractionTextHTML(question.prompt)}</div>
+        <div class="fraction-topic-prompt">${question.topic === 'improper-fractions' ? renderMixedFractionHTML(question.prompt) : renderFractionTextHTML(question.prompt)}</div>
       </div>
     </div>`;
 }
@@ -644,7 +644,7 @@ function buildFractionQuestion(topic) {
       return {
         kind: 'fraction',
         topic,
-        prompt: `Convert ${formatMixedFraction(whole, fraction.numerator, fraction.denominator)} to an improper fraction.`,
+        prompt: formatMixedFraction(whole, fraction.numerator, fraction.denominator),
         answer: fractionToText({ numerator: whole * fraction.denominator + fraction.numerator, denominator: fraction.denominator }),
       };
     }
@@ -867,6 +867,15 @@ function formatMixedFraction(whole, numerator, denominator) {
   return `${whole} ${numerator}/${denominator}`;
 }
 
+function renderMixedFractionHTML(value) {
+  const match = String(value).match(/^(\d+) (\d+)\/(\d+)$/);
+  if (!match) {
+    return renderFractionTextHTML(String(value));
+  }
+
+  return `${escapeHtml(match[1])} ${renderFractionTextHTML(`${match[2]}/${match[3]}`)}`;
+}
+
 function reduceFraction(numerator, denominator) {
   const divisor = gcd(Math.abs(numerator), Math.abs(denominator));
   numerator = numerator / divisor;
@@ -915,6 +924,10 @@ function renderFractionTextHTML(value) {
 function getPageInstruction(topic) {
   if (topic === 'mixed-fractions') {
     return 'Convert the following to a mixed fraction:';
+  }
+
+  if (topic === 'improper-fractions') {
+    return 'Convert the following to an improper fraction:';
   }
 
   return '';
