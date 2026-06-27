@@ -210,10 +210,11 @@ function renderVerticalQuestion(num, question, symbol) {
 }
 
 function renderLongDivisionQuestion(num, question) {
+  const dividendWidth = String(question.a).length + 2;
   return `
     <div class="question question-long-division">
       <div class="question-number">${num}.</div>
-      <div class="long-division">
+      <div class="long-division" style="--dividend-ch:${dividendWidth}">
         <div class="long-division-answer"></div>
         <div class="long-division-divisor">${question.b}</div>
         <div class="long-division-dividend">${question.a}</div>
