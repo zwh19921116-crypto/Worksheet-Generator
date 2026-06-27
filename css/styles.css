@@ -249,6 +249,15 @@ main {
   color: #1a202c;
 }
 
+.worksheet-module {
+  margin-top: 2mm;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #2b6cb0;
+}
+
 .meta-fields {
   display: flex;
   justify-content: space-between;

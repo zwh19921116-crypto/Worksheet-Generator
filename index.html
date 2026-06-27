@@ -17,6 +17,18 @@
       <h2>Worksheet Settings</h2>
 
       <div class="form-group">
+        <label for="module">Module</label>
+        <select id="module">
+          <option value="number">Number</option>
+          <option value="arithmetic">Arithmetic</option>
+          <option value="algebra">Algebra</option>
+          <option value="geometry">Geometry</option>
+          <option value="measurement">Measurement</option>
+          <option value="statistics">Statistics</option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="topic">Topic</label>
         <select id="topic">
           <optgroup label="Basic Operations">
@@ -49,11 +61,6 @@
         </select>
       </div>
 
-      <div class="form-group" id="rangeGroup">
-        <label for="minNum">Min Number</label>
-        <input type="number" id="minNum" value="1" min="0" max="999" />
-      </div>
-
       <div class="form-row" id="rangeRow">
         <div class="form-group" id="rangeGroup">
           <label for="minNum">Min</label>
@@ -63,6 +70,11 @@
           <label for="maxNum">Max</label>
           <input type="number" id="maxNum" value="12" min="1" max="999" />
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="numQuestions">Number of Questions</label>
+        <input type="number" id="numQuestions" value="20" min="1" max="100" />
       </div>
 
       <div class="form-group">

@@ -10,6 +10,7 @@ const pagination       = document.getElementById('pagination');
 const prevBtn          = document.getElementById('prevBtn');
 const nextBtn          = document.getElementById('nextBtn');
 const pageIndicator    = document.getElementById('pageIndicator');
+const moduleSelect     = document.getElementById('module');
 const topicSelect      = document.getElementById('topic');
 const timesTableGroup  = document.getElementById('timesTableGroup');
 const rangeRow         = document.getElementById('rangeRow');
@@ -33,6 +34,7 @@ prevBtn.addEventListener('click', () => showPage(currentPage - 1));
 nextBtn.addEventListener('click', () => showPage(currentPage + 1));
 
 function generateWorksheet() {
+  const module      = moduleSelect.value;
   const topic       = topicSelect.value;
   const minNum      = parseInt(document.getElementById('minNum').value, 10);
   const maxNum      = parseInt(document.getElementById('maxNum').value, 10);
@@ -47,10 +49,22 @@ function generateWorksheet() {
   }
 
   const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable);
-  allPages = paginateQuestions(questions, title, topic, includeMeta);
+  allPages = paginateQuestions(questions, title, module, includeMeta);
   currentPage = 0;
   showPage(0);
   printBtn.disabled = false;
+}
+
+function moduleLabel(module) {
+  const map = {
+    number: 'Number',
+    arithmetic: 'Arithmetic',
+    algebra: 'Algebra',
+    geometry: 'Geometry',
+    measurement: 'Measurement',
+    statistics: 'Statistics',
+  };
+  return map[module] || 'Mathematics';
 }
 
 function topicLabel(topic, timesTable) {
@@ -65,14 +79,14 @@ function topicLabel(topic, timesTable) {
   return map[topic] || 'Math Practice';
 }
 
-function paginateQuestions(questions, title, topic, includeMeta) {
+function paginateQuestions(questions, title, module, includeMeta) {
   const pages = [];
   const totalPages = Math.ceil(questions.length / QUESTIONS_PER_PAGE);
 
   for (let p = 0; p < totalPages; p++) {
     const slice    = questions.slice(p * QUESTIONS_PER_PAGE, (p + 1) * QUESTIONS_PER_PAGE);
     const startIdx = p * QUESTIONS_PER_PAGE;
-    pages.push(buildPageHTML(slice, startIdx, title, includeMeta, p + 1, totalPages));
+    pages.push(buildPageHTML(slice, startIdx, title, module, includeMeta, p + 1, totalPages));
   }
   return pages;
 }
@@ -89,7 +103,7 @@ function showPage(index) {
   pagination.style.display = total > 1 ? 'flex' : 'none';
 }
 
-function buildPageHTML(questions, startIdx, title, includeMeta, pageNum, totalPages) {
+function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum, totalPages) {
   const opSymbol = { addition: '+', subtraction: '−', multiplication: '×', division: '÷' };
 
   const cols = 4;
@@ -98,6 +112,7 @@ function buildPageHTML(questions, startIdx, title, includeMeta, pageNum, totalPa
 
   // Header
   html += `<div class="worksheet-header"><h2>${escapeHtml(title)}</h2>`;
+  html += `<div class="worksheet-module">Module: ${escapeHtml(moduleLabel(module))}</div>`;
   if (includeMeta) {
     html += `<div class="meta-fields">
       <span>Name: <span class="meta-field"></span></span>
