@@ -307,6 +307,8 @@ function showPage(index) {
 
 function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages) {
   const opSymbol = { addition: '+', subtraction: '−', multiplication: '×', division: '÷' };
+  const pageTopic = questions[0]?.topic;
+  const pageInstruction = getPageInstruction(pageTopic);
 
   const cols = 2;
   const rows = Math.ceil(questions.length / cols);
@@ -321,6 +323,9 @@ function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages) 
       <span>Date: <span class="meta-field"></span></span>
       <span>Score: <span class="meta-field"></span></span>
     </div>`;
+  }
+  if (pageInstruction) {
+    html += `<div class="page-instruction">${escapeHtml(pageInstruction)}</div>`;
   }
   html += `</div>`;
 
@@ -344,10 +349,15 @@ function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages) 
 }
 
 function buildSolutionsPageHTML(questions, startIdx, title, module, pageNum, totalPages) {
+  const pageTopic = questions[0]?.topic;
+  const pageInstruction = getPageInstruction(pageTopic);
   let html = `<div class="a4-page solutions-page">`;
 
   html += `<div class="worksheet-header"><h2>${escapeHtml(title)} - Solutions</h2>`;
   html += `<div class="worksheet-module">Module: ${escapeHtml(moduleLabel(module))}</div>`;
+  if (pageInstruction) {
+    html += `<div class="page-instruction">${escapeHtml(pageInstruction)}</div>`;
+  }
   html += `</div>`;
 
   html += `<div class="solutions-grid">`;
@@ -624,7 +634,7 @@ function buildFractionQuestion(topic) {
       return {
         kind: 'fraction',
         topic,
-        prompt: `Convert ${fractionToText({ numerator: whole * fraction.denominator + fraction.numerator, denominator: fraction.denominator })} to a mixed fraction.`,
+        prompt: fractionToText({ numerator: whole * fraction.denominator + fraction.numerator, denominator: fraction.denominator }),
         answer: formatMixedFraction(whole, fraction.numerator, fraction.denominator),
       };
     }
@@ -900,6 +910,14 @@ function renderFractionTextHTML(value) {
   }
 
   return parts.join('');
+}
+
+function getPageInstruction(topic) {
+  if (topic === 'mixed-fractions') {
+    return 'Convert the following to a mixed fraction';
+  }
+
+  return '';
 }
 
 function buildUniquePlaceValueDigits(length, targetIndex, targetDigit) {
