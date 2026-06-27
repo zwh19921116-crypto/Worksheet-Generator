@@ -463,7 +463,7 @@ function renderFractionQuestion(num, question) {
     <div class="question question-fraction-topic">
       <div class="question-number">${num}.</div>
       <div class="fraction-topic-body">
-        <div class="fraction-topic-prompt">${escapeHtml(question.prompt)}</div>
+        <div class="fraction-topic-prompt">${renderFractionTextHTML(question.prompt)}</div>
         <div class="fraction-topic-answer-line"></div>
       </div>
     </div>`;
@@ -472,7 +472,7 @@ function renderFractionQuestion(num, question) {
 function renderSolutionHTML(question) {
   if (question.kind !== 'number') {
     if (question.kind === 'fraction') {
-      return `${escapeHtml(question.prompt)} = ${renderFractionValueHTML(question.answer)}`;
+      return `${renderFractionTextHTML(question.prompt)} = ${renderFractionTextHTML(String(question.answer))}`;
     }
     return escapeHtml(formatSolution(question));
   }
@@ -877,12 +877,30 @@ function gcd(a, b) {
 }
 
 function renderFractionValueHTML(value) {
-  const match = String(value).match(/^(\d+)\/(\d+)$/);
-  if (!match) {
-    return escapeHtml(String(value));
+  return renderFractionTextHTML(String(value));
+}
+
+function renderFractionTextHTML(value) {
+  const text = String(value);
+  const parts = [];
+  const regex = /(\d+)\/(\d+)/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(escapeHtml(text.slice(lastIndex, match.index)));
+    }
+
+    parts.push(`<span class="fraction-inline"><span class="fraction-numerator">${escapeHtml(match[1])}</span><span class="fraction-line"></span><span class="fraction-denominator">${escapeHtml(match[2])}</span></span>`);
+    lastIndex = regex.lastIndex;
   }
 
-  return `<span class="fraction-inline"><span class="fraction-numerator">${escapeHtml(match[1])}</span><span class="fraction-line"></span><span class="fraction-denominator">${escapeHtml(match[2])}</span></span>`;
+  if (lastIndex < text.length) {
+    parts.push(escapeHtml(text.slice(lastIndex)));
+  }
+
+  return parts.join('');
 }
 
 function buildUniquePlaceValueDigits(length, targetIndex, targetDigit) {
