@@ -537,12 +537,13 @@ function buildNumberQuestion(topic, min, max) {
       };
     }
     case 'place-value': {
-      const value = randomInt(100, 99999);
-      const digits = String(value).split('');
-      const index = randomInt(0, digits.length - 1);
-      const digit = digits[index];
-      const placeValue = Number(digit) * Math.pow(10, digits.length - index - 1);
-      const placeName = getPlaceName(digits.length - index - 1);
+      const digitsCount = randomInt(3, 5);
+      const index = randomInt(0, digitsCount - 1);
+      const digit = String(randomInt(0, 9));
+      const digits = buildUniquePlaceValueDigits(digitsCount, index, digit);
+      const value = digits.join('');
+      const placeValue = Number(digit) * Math.pow(10, digitsCount - index - 1);
+      const placeName = getPlaceName(digitsCount - index - 1);
       return {
         kind: 'number',
         topic,
@@ -667,6 +668,25 @@ function uniqueRandomValues(count, min, max) {
 
 function pickRandomFromList(list) {
   return list[randomInt(0, list.length - 1)];
+}
+
+function buildUniquePlaceValueDigits(length, targetIndex, targetDigit) {
+  const digits = new Array(length);
+  digits[targetIndex] = targetDigit;
+
+  for (let i = 0; i < length; i++) {
+    if (i === targetIndex) {
+      continue;
+    }
+
+    let nextDigit = String(randomInt(0, 9));
+    while (nextDigit === targetDigit || (i === 0 && nextDigit === '0')) {
+      nextDigit = String(randomInt(0, 9));
+    }
+    digits[i] = nextDigit;
+  }
+
+  return digits;
 }
 
 function getPlaceName(power) {
