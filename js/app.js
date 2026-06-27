@@ -1382,14 +1382,50 @@ function buildMeasurementQuestion(topic, min, max) {
       };
     }
     case 'volume': {
-      const l = randomInt(2, 12);
-      const w = randomInt(2, 12);
-      const h = randomInt(2, 12);
+      const solidType = pickRandomFromList(['cuboid', 'cube', 'cylinder', 'triangular-prism']);
+
+      if (solidType === 'cuboid') {
+        const l = randomInt(2, 12);
+        const w = randomInt(2, 12);
+        const h = randomInt(2, 12);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Cuboid ${l} cm by ${w} cm by ${h} cm. Find the volume`,
+          answer: `${l * w * h} cm³`,
+        };
+      }
+
+      if (solidType === 'cube') {
+        const side = randomInt(2, 14);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Cube side length ${side} cm. Find the volume`,
+          answer: `${side * side * side} cm³`,
+        };
+      }
+
+      if (solidType === 'cylinder') {
+        const radius = randomInt(2, 10);
+        const height = randomInt(2, 16);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Cylinder radius ${radius} cm and height ${height} cm. Find the volume`,
+          answer: `${radius * radius * height}π cm³`,
+        };
+      }
+
+      const base = randomInt(2, 14);
+      const triHeight = randomInt(2, 14);
+      const length = randomInt(2, 14);
+      const volume = (base * triHeight * length) / 2;
       return {
         kind: 'measurement',
         topic,
-        prompt: `Cuboid ${l} cm by ${w} cm by ${h} cm. Find the volume`,
-        answer: `${l * w * h} cm³`,
+        prompt: `Triangular prism with triangle base ${base} cm, triangle height ${triHeight} cm and prism length ${length} cm. Find the volume`,
+        answer: `${formatDecimalResult(volume)} cm³`,
       };
     }
     case 'surface-area': {
