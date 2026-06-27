@@ -420,6 +420,10 @@ function renderSolutionHTML(question) {
     return escapeHtml(formatSolution(question));
   }
 
+  if (isYesNoNumberQuestion(question)) {
+    return `${renderNumberPromptHTML(question)} = Yes`;
+  }
+
   return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
 }
 
@@ -734,6 +738,10 @@ function renderNumberPromptHTML(question) {
     default:
       return escapeHtml(question.prompt);
   }
+}
+
+function isYesNoNumberQuestion(question) {
+  return typeof question.prompt === 'string' && question.prompt.startsWith('Is ');
 }
 
 const PRIME_NUMBERS = [
