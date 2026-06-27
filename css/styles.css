@@ -362,11 +362,11 @@ main {
 }
 
 .long-division {
-  width: 100%;
-  max-width: 6.2rem;
+  width: max-content;
+  max-width: none;
   margin: 0 0 0 1.3rem;
   display: grid;
-  grid-template-columns: auto minmax(3rem, 1fr);
+  grid-template-columns: max-content max-content;
   grid-template-rows: auto;
   column-gap: 0;
   row-gap: 0;
@@ -393,11 +393,11 @@ main {
 .long-division-dividend {
   grid-column: 2;
   grid-row: 1;
-  min-width: 3rem;
+  min-width: 0;
   border-top: 2px solid #2b6cb0;
   border-left: 2px solid #2b6cb0;
   text-align: right;
-  padding: 0.18rem 0 0 0.18rem;
+  padding: 0.18rem 0.05rem 0 0.18rem;
 }
 
 /* ---- Page Footer ---- */
