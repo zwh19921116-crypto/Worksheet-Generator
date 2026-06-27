@@ -1,0 +1,233 @@
+/* ===========================
+   Math Worksheet Generator
+   styles.css
+   =========================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f4f8;
+  color: #1a202c;
+  min-height: 100vh;
+}
+
+/* ---- Header ---- */
+header {
+  background: #2b6cb0;
+  color: #fff;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+header .subtitle {
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
+/* ---- Layout ---- */
+main {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+@media (max-width: 720px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Controls Panel ---- */
+.controls {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  height: fit-content;
+}
+
+.controls h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2b6cb0;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #bee3f8;
+  padding-bottom: 0.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: #2d3748;
+}
+
+.form-group input[type="number"],
+.form-group input[type="text"],
+.form-group select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input[type="number"]:focus,
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #2b6cb0;
+  box-shadow: 0 0 0 3px rgba(43,108,176,0.15);
+}
+
+.form-group input[type="checkbox"] {
+  margin-right: 0.4rem;
+  accent-color: #2b6cb0;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-primary {
+  background: #2b6cb0;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #2c5282;
+}
+
+.btn-secondary {
+  background: #ebf8ff;
+  color: #2b6cb0;
+  border: 1.5px solid #2b6cb0;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #bee3f8;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- Preview Panel ---- */
+.preview {
+  background: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  min-height: 500px;
+}
+
+.placeholder {
+  color: #a0aec0;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 4rem;
+}
+
+/* ---- Worksheet Output ---- */
+.worksheet {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.worksheet-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.worksheet-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.meta-fields {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: #4a5568;
+}
+
+.meta-field {
+  border-bottom: 1.5px solid #4a5568;
+  min-width: 180px;
+  padding-bottom: 2px;
+}
+
+.questions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.25rem 1rem;
+  margin-top: 1rem;
+}
+
+.question {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  text-align: center;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.answer-line {
+  display: inline-block;
+  border-bottom: 2px solid #2b6cb0;
+  min-width: 48px;
+  margin-left: 0.25rem;
+}
+
+/* ---- Print Styles ---- */
+@media print {
+  body { background: #fff; }
+  header, .controls { display: none; }
+  main { display: block; margin: 0; padding: 0; }
+  .preview {
+    box-shadow: none;
+    padding: 0;
+  }
+  .worksheet-header h2 { font-size: 1.8rem; }
+}
