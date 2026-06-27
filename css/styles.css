@@ -593,6 +593,11 @@ main {
   height: 8.8rem;
 }
 
+.measurement-volume-shape {
+  width: 11rem;
+  height: 8.8rem;
+}
+
 .measurement-shape-icon svg text {
   letter-spacing: 0.01em;
 }

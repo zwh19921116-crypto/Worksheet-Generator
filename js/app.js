@@ -711,6 +711,7 @@ function renderMeasurementPromptHTML(question) {
   const label = escapeHtml(String(question.prompt ?? ''));
   const shapeSvg = renderMeasurementShapeSVG(question);
   const areaPerimeterShapeClass = (question.topic === 'area' || question.topic === 'perimeter') ? ' measurement-area-perimeter-shape' : '';
+  const volumeShapeClass = question.topic === 'volume' ? ' measurement-volume-shape' : '';
 
   if (!shapeSvg) {
     return label;
@@ -719,7 +720,7 @@ function renderMeasurementPromptHTML(question) {
   return `
     <span class="geometry-shape-stack">
       <span class="geometry-shape-question">${label}</span>
-      <span class="geometry-shape-icon measurement-shape-icon${areaPerimeterShapeClass}" aria-hidden="true">${shapeSvg}</span>
+      <span class="geometry-shape-icon measurement-shape-icon${areaPerimeterShapeClass}${volumeShapeClass}" aria-hidden="true">${shapeSvg}</span>
     </span>`;
 }
 
@@ -756,19 +757,19 @@ function renderMeasurementShapeSVG(question) {
   }
 
   if (question.shape === 'cuboid') {
-    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="38,32 88,32 106,46 56,46" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="30,46 80,46 80,88 30,88" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="80,46 106,46 106,88 80,88" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="38" y1="32" x2="30" y2="46" stroke="currentColor" stroke-width="2.2"/><text x="59" y="27" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.length)}</text><text x="114" y="68" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.width)}</text><text x="18" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.height)}</text></svg>`;
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="38,32 88,32 106,46 56,46" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="30,46 80,46 80,88 30,88" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="80,46 106,46 106,88 80,88" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="38" y1="32" x2="30" y2="46" stroke="currentColor" stroke-width="2.2"/><text x="59" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.length)}</text><text x="126" y="68" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.width)}</text><text x="10" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.height)}</text></svg>`;
   }
 
   if (question.shape === 'cube') {
-    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="48,30 86,30 102,44 64,44" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="34,44 72,44 72,82 34,82" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="72,44 102,44 102,82 72,82" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="48" y1="30" x2="34" y2="44" stroke="currentColor" stroke-width="2.2"/><text x="69" y="24" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.side)}</text></svg>`;
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="48,30 86,30 102,44 64,44" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="34,44 72,44 72,82 34,82" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="72,44 102,44 102,82 72,82" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="48" y1="30" x2="34" y2="44" stroke="currentColor" stroke-width="2.2"/><text x="69" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.side)}</text></svg>`;
   }
 
   if (question.shape === 'cylinder') {
-    return `<svg viewBox="0 0 140 110" aria-hidden="true"><ellipse cx="70" cy="30" rx="24" ry="8" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="46" y1="30" x2="46" y2="84" stroke="currentColor" stroke-width="2.2"/><line x1="94" y1="30" x2="94" y2="84" stroke="currentColor" stroke-width="2.2"/><ellipse cx="70" cy="84" rx="24" ry="8" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="70" y1="30" x2="94" y2="30" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="108" y="34" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">r = ${format(dims.radius)}</text><text x="28" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">h = ${format(dims.height)}</text></svg>`;
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><ellipse cx="70" cy="30" rx="24" ry="8" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="46" y1="30" x2="46" y2="84" stroke="currentColor" stroke-width="2.2"/><line x1="94" y1="30" x2="94" y2="84" stroke="currentColor" stroke-width="2.2"/><ellipse cx="70" cy="84" rx="24" ry="8" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="70" y1="30" x2="94" y2="30" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="122" y="26" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">r = ${format(dims.radius)}</text><text x="18" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">h = ${format(dims.height)}</text></svg>`;
   }
 
   if (question.shape === 'triangular-prism') {
-    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="28,84 56,40 56,84" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="72,84 100,40 100,84" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="28" y1="84" x2="72" y2="84" stroke="currentColor" stroke-width="2.2"/><line x1="56" y1="40" x2="100" y2="40" stroke="currentColor" stroke-width="2.2"/><line x1="56" y1="84" x2="100" y2="84" stroke="currentColor" stroke-width="2.2"/><line x1="56" y1="40" x2="56" y2="84" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="42" y="100" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.base)}</text><text x="64" y="64" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">${format(dims.triHeight)}</text><text x="78" y="94" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.length)}</text></svg>`;
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="28,84 56,40 56,84" fill="none" stroke="currentColor" stroke-width="2.2"/><polygon points="72,84 100,40 100,84" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="28" y1="84" x2="72" y2="84" stroke="currentColor" stroke-width="2.2"/><line x1="56" y1="40" x2="100" y2="40" stroke="currentColor" stroke-width="2.2"/><line x1="56" y1="84" x2="100" y2="84" stroke="currentColor" stroke-width="2.2"/><line x1="56" y1="40" x2="56" y2="84" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="42" y="106" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.base)}</text><text x="108" y="64" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">${format(dims.triHeight)}</text><text x="116" y="94" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.length)}</text></svg>`;
   }
 
   return '';
