@@ -685,6 +685,7 @@ function renderMeasurementQuestion(num, question) {
 function renderMeasurementPromptHTML(question) {
   const label = escapeHtml(String(question.prompt ?? ''));
   const shapeSvg = renderMeasurementShapeSVG(question);
+  const areaPerimeterShapeClass = (question.topic === 'area' || question.topic === 'perimeter') ? ' measurement-area-perimeter-shape' : '';
 
   if (!shapeSvg) {
     return label;
@@ -693,7 +694,7 @@ function renderMeasurementPromptHTML(question) {
   return `
     <span class="geometry-shape-stack">
       <span class="geometry-shape-question">${label}</span>
-      <span class="geometry-shape-icon measurement-shape-icon" aria-hidden="true">${shapeSvg}</span>
+      <span class="geometry-shape-icon measurement-shape-icon${areaPerimeterShapeClass}" aria-hidden="true">${shapeSvg}</span>
     </span>`;
 }
 
@@ -706,19 +707,19 @@ function renderMeasurementShapeSVG(question) {
   const format = (value) => escapeHtml(`${value} cm`);
 
   if (question.shape === 'rectangle') {
-    return `<svg viewBox="0 0 140 110" aria-hidden="true"><rect x="28" y="24" width="76" height="52" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="66" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.length)}</text><text x="112" y="53" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.width)}</text></svg>`;
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><rect x="28" y="24" width="76" height="52" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="66" y="13" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.length)}</text><text x="125" y="53" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.width)}</text></svg>`;
   }
 
   if (question.shape === 'square') {
-    return `<svg viewBox="0 0 140 110" aria-hidden="true"><rect x="38" y="20" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="70" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.side)}</text></svg>`;
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><rect x="38" y="20" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="70" y="11" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.side)}</text></svg>`;
   }
 
   if (question.shape === 'triangle-area') {
-    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="26,82 114,82 70,24" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="70" y1="24" x2="70" y2="82" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="70" y="98" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.base)}</text><text x="78" y="56" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">${format(dims.height)}</text></svg>`;
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="26,82 114,82 70,24" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="70" y1="24" x2="70" y2="82" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="70" y="102" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.base)}</text><text x="116" y="56" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">${format(dims.height)}</text></svg>`;
   }
 
   if (question.shape === 'parallelogram') {
-    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="36,80 112,80 94,30 18,30" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="94" y1="30" x2="94" y2="80" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="64" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.base)}</text><text x="100" y="58" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">${format(dims.height)}</text></svg>`;
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="36,80 112,80 94,30 18,30" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="94" y1="30" x2="94" y2="80" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="64" y="102" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.base)}</text><text x="118" y="58" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">${format(dims.height)}</text></svg>`;
   }
 
   if (question.shape === 'triangle-perimeter') {

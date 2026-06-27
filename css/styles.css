@@ -565,6 +565,11 @@ main {
   height: 7.2rem;
 }
 
+.measurement-area-perimeter-shape {
+  width: 11rem;
+  height: 8.8rem;
+}
+
 .measurement-shape-icon svg text {
   letter-spacing: 0.01em;
 }
