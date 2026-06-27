@@ -559,6 +559,19 @@ main {
   display: inline-block;
 }
 
+.geometry-topic-large-shape .geometry-shape-with-label {
+  gap: 0.75rem;
+}
+
+.geometry-topic-large-shape .geometry-shape-icon {
+  width: 2.8rem;
+  height: 2.8rem;
+}
+
+.geometry-topic-large-shape .geometry-shape-label {
+  font-size: 1.05rem;
+}
+
 .geometry-topic-answer-line {
   width: 100%;
   min-height: 1.8rem;

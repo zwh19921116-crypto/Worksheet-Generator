@@ -383,7 +383,12 @@ function getQuestionsPerPage(questions) {
   const bodmasOnly = questions.length > 0 && questions.every((question) => question.operation === 'bodmas');
   const numberOnly = questions.length > 0 && questions.every((question) => question.kind === 'number');
   const fractionOnly = questions.length > 0 && questions.every((question) => question.kind === 'fraction');
+  const geometryShapesOnly = questions.length > 0 && questions.every((question) => question.kind === 'geometry' && (question.topic === '2d-shapes' || question.topic === '3d-shapes'));
   const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
+
+  if (geometryShapesOnly) {
+    return 4;
+  }
 
   if (bodmasOnly) {
     return 8;
@@ -1635,10 +1640,11 @@ function renderAlgebraQuestion(num, question) {
 }
 
 function renderGeometryQuestion(num, question) {
+  const largeShapeClass = (question.topic === '2d-shapes' || question.topic === '3d-shapes') ? ' geometry-topic-large-shape' : '';
   return `
     <div class="question question-geometry-topic">
       <div class="question-number">${num}.</div>
-      <div class="geometry-topic-body">
+      <div class="geometry-topic-body${largeShapeClass}">
         <div class="geometry-topic-prompt">${renderGeometryPromptHTML(question)}</div>
         <div class="geometry-topic-answer-line"></div>
       </div>
