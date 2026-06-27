@@ -420,9 +420,14 @@ function getQuestionsPerPage(questions) {
   const numberOnly = questions.length > 0 && questions.every((question) => question.kind === 'number');
   const fractionOnly = questions.length > 0 && questions.every((question) => question.kind === 'fraction');
   const geometryShapesOnly = questions.length > 0 && questions.every((question) => question.kind === 'geometry' && (question.topic === '2d-shapes' || question.topic === '3d-shapes'));
+  const measurementAreaPerimeterOnly = questions.length > 0 && questions.every((question) => question.kind === 'measurement' && (question.topic === 'area' || question.topic === 'perimeter'));
   const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
 
   if (geometryShapesOnly) {
+    return 4;
+  }
+
+  if (measurementAreaPerimeterOnly) {
     return 4;
   }
 
@@ -671,10 +676,60 @@ function renderMeasurementQuestion(num, question) {
     <div class="question question-number-topic">
       <div class="question-number">${num}.</div>
       <div class="number-topic-body">
-        <div class="number-topic-prompt">${escapeHtml(String(question.prompt ?? ''))}</div>
+        <div class="number-topic-prompt">${renderMeasurementPromptHTML(question)}</div>
         <div class="number-topic-answer-line"></div>
       </div>
     </div>`;
+}
+
+function renderMeasurementPromptHTML(question) {
+  const label = escapeHtml(String(question.prompt ?? ''));
+  const shapeSvg = renderMeasurementShapeSVG(question);
+
+  if (!shapeSvg) {
+    return label;
+  }
+
+  return `
+    <span class="geometry-shape-stack">
+      <span class="geometry-shape-question">${label}</span>
+      <span class="geometry-shape-icon measurement-shape-icon" aria-hidden="true">${shapeSvg}</span>
+    </span>`;
+}
+
+function renderMeasurementShapeSVG(question) {
+  if ((question.topic !== 'area' && question.topic !== 'perimeter') || !question.shape) {
+    return '';
+  }
+
+  const dims = question.dimensions || {};
+  const format = (value) => escapeHtml(`${value} cm`);
+
+  if (question.shape === 'rectangle') {
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><rect x="28" y="24" width="76" height="52" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="66" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.length)}</text><text x="112" y="53" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.width)}</text></svg>`;
+  }
+
+  if (question.shape === 'square') {
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><rect x="38" y="20" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="70" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.side)}</text></svg>`;
+  }
+
+  if (question.shape === 'triangle-area') {
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="26,82 114,82 70,24" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="70" y1="24" x2="70" y2="82" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="70" y="98" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.base)}</text><text x="78" y="56" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">${format(dims.height)}</text></svg>`;
+  }
+
+  if (question.shape === 'parallelogram') {
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="36,80 112,80 94,30 18,30" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="94" y1="30" x2="94" y2="80" stroke="currentColor" stroke-dasharray="4 3" stroke-width="1.8"/><text x="64" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.base)}</text><text x="100" y="58" text-anchor="start" font-size="10" font-weight="700" fill="currentColor">${format(dims.height)}</text></svg>`;
+  }
+
+  if (question.shape === 'triangle-perimeter') {
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="24,84 114,84 74,26" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="69" y="100" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.c)}</text><text x="42" y="54" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.a)}</text><text x="102" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.b)}</text></svg>`;
+  }
+
+  if (question.shape === 'regular-pentagon') {
+    return `<svg viewBox="0 0 140 110" aria-hidden="true"><polygon points="70,16 112,48 96,94 44,94 28,48" fill="none" stroke="currentColor" stroke-width="2.2"/><text x="70" y="107" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${format(dims.side)}</text></svg>`;
+  }
+
+  return '';
 }
 
 function renderSolutionHTML(question) {
@@ -1230,6 +1285,8 @@ function buildMeasurementQuestion(topic, min, max) {
         return {
           kind: 'measurement',
           topic,
+          shape: 'rectangle',
+          dimensions: { length, width },
           prompt: `Rectangle ${length} cm by ${width} cm. Find the area`,
           answer: `${length * width} cm²`,
         };
@@ -1240,6 +1297,8 @@ function buildMeasurementQuestion(topic, min, max) {
         return {
           kind: 'measurement',
           topic,
+          shape: 'square',
+          dimensions: { side },
           prompt: `Square side length ${side} cm. Find the area`,
           answer: `${side * side} cm²`,
         };
@@ -1252,6 +1311,8 @@ function buildMeasurementQuestion(topic, min, max) {
         return {
           kind: 'measurement',
           topic,
+          shape: 'triangle-area',
+          dimensions: { base, height },
           prompt: `Triangle base ${base} cm and height ${height} cm. Find the area`,
           answer: `${formatDecimalResult(area)} cm²`,
         };
@@ -1262,6 +1323,8 @@ function buildMeasurementQuestion(topic, min, max) {
       return {
         kind: 'measurement',
         topic,
+        shape: 'parallelogram',
+        dimensions: { base, height },
         prompt: `Parallelogram base ${base} cm and perpendicular height ${height} cm. Find the area`,
         answer: `${base * height} cm²`,
       };
@@ -1275,6 +1338,8 @@ function buildMeasurementQuestion(topic, min, max) {
         return {
           kind: 'measurement',
           topic,
+          shape: 'rectangle',
+          dimensions: { length, width },
           prompt: `Rectangle ${length} cm by ${width} cm. Find the perimeter`,
           answer: `${2 * (length + width)} cm`,
         };
@@ -1285,6 +1350,8 @@ function buildMeasurementQuestion(topic, min, max) {
         return {
           kind: 'measurement',
           topic,
+          shape: 'square',
+          dimensions: { side },
           prompt: `Square side length ${side} cm. Find the perimeter`,
           answer: `${4 * side} cm`,
         };
@@ -1297,6 +1364,8 @@ function buildMeasurementQuestion(topic, min, max) {
         return {
           kind: 'measurement',
           topic,
+          shape: 'triangle-perimeter',
+          dimensions: { a, b, c },
           prompt: `Triangle side lengths ${a} cm, ${b} cm and ${c} cm. Find the perimeter`,
           answer: `${a + b + c} cm`,
         };
@@ -1306,6 +1375,8 @@ function buildMeasurementQuestion(topic, min, max) {
       return {
         kind: 'measurement',
         topic,
+        shape: 'regular-pentagon',
+        dimensions: { side },
         prompt: `Regular pentagon side length ${side} cm. Find the perimeter`,
         answer: `${5 * side} cm`,
       };

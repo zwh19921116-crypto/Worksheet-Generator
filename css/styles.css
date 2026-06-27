@@ -560,6 +560,15 @@ main {
   height: 100%;
 }
 
+.measurement-shape-icon {
+  width: 9rem;
+  height: 7.2rem;
+}
+
+.measurement-shape-icon svg text {
+  letter-spacing: 0.01em;
+}
+
 .geometry-circle-diagram {
   width: 8rem;
   height: 8rem;
