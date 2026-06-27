@@ -236,6 +236,16 @@ main {
   overflow: hidden;
 }
 
+@media screen {
+  .preview {
+    overflow: auto;
+  }
+
+  .preview .a4-page {
+    zoom: 0.72;
+  }
+}
+
 /* ---- Worksheet Header ---- */
 .worksheet-header {
   text-align: center;
