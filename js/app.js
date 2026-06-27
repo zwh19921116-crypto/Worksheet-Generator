@@ -459,6 +459,7 @@ function getQuestionsPerPage(questions) {
   const measurementAreaPerimeterOnly = questions.length > 0 && questions.every((question) => question.kind === 'measurement' && (question.topic === 'area' || question.topic === 'perimeter'));
   const measurementVolumeOnly = questions.length > 0 && questions.every((question) => question.kind === 'measurement' && question.topic === 'volume');
   const measurementSurfaceAreaOnly = questions.length > 0 && questions.every((question) => question.kind === 'measurement' && question.topic === 'surface-area');
+  const trigonometryOnly = questions.length > 0 && questions.every((question) => question.kind === 'trigonometry');
   const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
 
   if (geometryShapesOnly) {
@@ -474,6 +475,10 @@ function getQuestionsPerPage(questions) {
   }
 
   if (measurementSurfaceAreaOnly) {
+    return 4;
+  }
+
+  if (trigonometryOnly) {
     return 4;
   }
 
