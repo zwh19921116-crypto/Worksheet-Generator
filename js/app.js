@@ -1222,23 +1222,92 @@ function buildMeasurementQuestion(topic, min, max) {
       };
     }
     case 'area': {
-      const length = randomInt(2, 20);
-      const width = randomInt(2, 20);
+      const shapeType = pickRandomFromList(['rectangle', 'square', 'triangle', 'parallelogram']);
+
+      if (shapeType === 'rectangle') {
+        const length = randomInt(2, 20);
+        const width = randomInt(2, 20);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Rectangle ${length} cm by ${width} cm. Find the area`,
+          answer: `${length * width} cm²`,
+        };
+      }
+
+      if (shapeType === 'square') {
+        const side = randomInt(2, 20);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Square side length ${side} cm. Find the area`,
+          answer: `${side * side} cm²`,
+        };
+      }
+
+      if (shapeType === 'triangle') {
+        const base = randomInt(2, 20);
+        const height = randomInt(2, 20);
+        const area = (base * height) / 2;
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Triangle base ${base} cm and height ${height} cm. Find the area`,
+          answer: `${formatDecimalResult(area)} cm²`,
+        };
+      }
+
+      const base = randomInt(2, 20);
+      const height = randomInt(2, 20);
       return {
         kind: 'measurement',
         topic,
-        prompt: `Rectangle ${length} cm by ${width} cm. Find the area`,
-        answer: `${length * width} cm²`,
+        prompt: `Parallelogram base ${base} cm and perpendicular height ${height} cm. Find the area`,
+        answer: `${base * height} cm²`,
       };
     }
     case 'perimeter': {
-      const length = randomInt(2, 20);
-      const width = randomInt(2, 20);
+      const shapeType = pickRandomFromList(['rectangle', 'square', 'triangle', 'regular-pentagon']);
+
+      if (shapeType === 'rectangle') {
+        const length = randomInt(2, 20);
+        const width = randomInt(2, 20);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Rectangle ${length} cm by ${width} cm. Find the perimeter`,
+          answer: `${2 * (length + width)} cm`,
+        };
+      }
+
+      if (shapeType === 'square') {
+        const side = randomInt(2, 20);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Square side length ${side} cm. Find the perimeter`,
+          answer: `${4 * side} cm`,
+        };
+      }
+
+      if (shapeType === 'triangle') {
+        const a = randomInt(3, 20);
+        const b = randomInt(3, 20);
+        const c = randomInt(Math.abs(a - b) + 1, a + b - 1);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Triangle side lengths ${a} cm, ${b} cm and ${c} cm. Find the perimeter`,
+          answer: `${a + b + c} cm`,
+        };
+      }
+
+      const side = randomInt(2, 20);
       return {
         kind: 'measurement',
         topic,
-        prompt: `Rectangle ${length} cm by ${width} cm. Find the perimeter`,
-        answer: `${2 * (length + width)} cm`,
+        prompt: `Regular pentagon side length ${side} cm. Find the perimeter`,
+        answer: `${5 * side} cm`,
       };
     }
     case 'volume': {
