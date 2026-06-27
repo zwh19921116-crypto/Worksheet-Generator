@@ -1092,12 +1092,23 @@ function buildGeometryQuestion(topic) {
       };
     }
     case 'circle-geometry': {
-      const diameter = randomInt(4, 30);
+      const askDiameter = randomInt(0, 1) === 0;
+      if (askDiameter) {
+        const diameter = randomInt(4, 30);
+        return {
+          kind: 'geometry',
+          topic,
+          prompt: `Diameter = ${diameter} cm`,
+          answer: `Radius = ${diameter / 2} cm`,
+        };
+      }
+
+      const radius = randomInt(2, 15);
       return {
         kind: 'geometry',
         topic,
-        prompt: `Diameter = ${diameter} cm`,
-        answer: `Radius = ${diameter / 2} cm`,
+        prompt: `Radius = ${radius} cm`,
+        answer: `Diameter = ${radius * 2} cm`,
       };
     }
     case 'geometric-reasoning': {
@@ -1664,6 +1675,19 @@ function renderGeometryPromptHTML(question) {
   const shapeName = rawPrompt.includes(':') ? rawPrompt.split(':')[0].trim() : rawPrompt;
   const label = escapeHtml(rawPrompt);
 
+  if (question.topic === 'circle-geometry') {
+    const diagram = renderCircleGeometrySVG(rawPrompt);
+    if (!diagram) {
+      return label;
+    }
+
+    return `
+      <span class="geometry-shape-stack">
+        <span class="geometry-shape-question">${label}</span>
+        <span class="geometry-shape-icon geometry-circle-diagram" aria-hidden="true">${diagram}</span>
+      </span>`;
+  }
+
   if (question.topic !== '2d-shapes' && question.topic !== '3d-shapes') {
     return label;
   }
@@ -1694,15 +1718,32 @@ function renderGeometryShapeSVG(shapeName, topic) {
   }
 
   const shapeMap = {
-    Cube: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="8,4 16,4 21,8 13,8" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="3,8 11,8 11,20 3,20" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="11,8 21,8 21,20 11,20" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="4" x2="3" y2="8" stroke="currentColor" stroke-width="1.8"/><line x1="16" y1="4" x2="21" y2="8" stroke="currentColor" stroke-width="1.8"/></svg>',
-    Cuboid: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="7,5 17,5 21,8 11,8" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="3,8 13,8 13,20 3,20" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="13,8 21,8 21,20 13,20" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="7" y1="5" x2="3" y2="8" stroke="currentColor" stroke-width="1.8"/><line x1="17" y1="5" x2="21" y2="8" stroke="currentColor" stroke-width="1.8"/></svg>',
-    'Triangular Prism': '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="4,18 10,6 16,18" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="8,18 14,6 20,18" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="18" x2="8" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="10" y1="6" x2="14" y2="6" stroke="currentColor" stroke-width="1.8"/><line x1="16" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="1.8"/></svg>',
-    'Square Pyramid': '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="4,18 20,18 16,21 8,21" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="4" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="20" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="16" y2="21" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="8" y2="21" stroke="currentColor" stroke-width="1.8"/></svg>',
-    Cylinder: '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="5" y1="6" x2="5" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="19" y1="6" x2="19" y2="18" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="18" rx="7" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
-    Cone: '<svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="4" x2="4" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="20" y2="18" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="18" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
-    Sphere: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="12" rx="8" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.2"/><ellipse cx="12" cy="12" rx="3.5" ry="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+    Cube: '<svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="32,10 50,20 32,30 14,20" fill="rgba(43,108,176,0.08)" stroke="currentColor" stroke-width="2"/><polygon points="14,20 32,30 32,52 14,42" fill="rgba(43,108,176,0.12)" stroke="currentColor" stroke-width="2"/><polygon points="32,30 50,20 50,42 32,52" fill="rgba(43,108,176,0.05)" stroke="currentColor" stroke-width="2"/></svg>',
+    Cuboid: '<svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="24,12 50,12 58,20 32,20" fill="rgba(43,108,176,0.08)" stroke="currentColor" stroke-width="2"/><polygon points="12,20 38,20 38,48 12,48" fill="rgba(43,108,176,0.12)" stroke="currentColor" stroke-width="2"/><polygon points="38,20 58,20 58,48 38,48" fill="rgba(43,108,176,0.05)" stroke="currentColor" stroke-width="2"/><line x1="24" y1="12" x2="12" y2="20" stroke="currentColor" stroke-width="2"/></svg>',
+    'Triangular Prism': '<svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="12,44 24,20 36,44" fill="rgba(43,108,176,0.12)" stroke="currentColor" stroke-width="2"/><polygon points="28,44 40,20 52,44" fill="rgba(43,108,176,0.05)" stroke="currentColor" stroke-width="2"/><line x1="12" y1="44" x2="28" y2="44" stroke="currentColor" stroke-width="2"/><line x1="24" y1="20" x2="40" y2="20" stroke="currentColor" stroke-width="2"/><line x1="36" y1="44" x2="52" y2="44" stroke="currentColor" stroke-width="2"/></svg>',
+    'Square Pyramid': '<svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="18,42 46,42 38,50 10,50" fill="rgba(43,108,176,0.06)" stroke="currentColor" stroke-width="2"/><polygon points="32,14 18,42 32,42" fill="rgba(43,108,176,0.12)" stroke="currentColor" stroke-width="2"/><polygon points="32,14 32,42 46,42" fill="rgba(43,108,176,0.03)" stroke="currentColor" stroke-width="2"/><line x1="32" y1="14" x2="38" y2="50" stroke="currentColor" stroke-width="2"/><line x1="32" y1="14" x2="10" y2="50" stroke="currentColor" stroke-width="2"/></svg>',
+    Cylinder: '<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="16" rx="16" ry="6" fill="rgba(43,108,176,0.05)" stroke="currentColor" stroke-width="2"/><line x1="16" y1="16" x2="16" y2="44" stroke="currentColor" stroke-width="2"/><line x1="48" y1="16" x2="48" y2="44" stroke="currentColor" stroke-width="2"/><ellipse cx="32" cy="44" rx="16" ry="6" fill="rgba(43,108,176,0.12)" stroke="currentColor" stroke-width="2"/></svg>',
+    Cone: '<svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="32,12 14,42 50,42" fill="rgba(43,108,176,0.08)" stroke="currentColor" stroke-width="2"/><ellipse cx="32" cy="42" rx="18" ry="6" fill="rgba(43,108,176,0.02)" stroke="currentColor" stroke-width="2"/></svg>',
+    Sphere: '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="18" fill="rgba(43,108,176,0.05)" stroke="currentColor" stroke-width="2"/><ellipse cx="32" cy="32" rx="18" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><ellipse cx="32" cy="32" rx="7" ry="18" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>',
   };
   return shapeMap[shapeName] || '';
+}
+
+function renderCircleGeometrySVG(promptText) {
+  const prompt = String(promptText ?? '');
+  const match = prompt.match(/^(Diameter|Radius)\s*=\s*(\d+(?:\.\d+)?)\s*cm$/i);
+  if (!match) {
+    return '';
+  }
+
+  const measureType = match[1].toLowerCase();
+  const valueText = `${match[2]} cm`;
+
+  if (measureType === 'diameter') {
+    return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="2"/><line x1="8" y1="32" x2="56" y2="32" stroke="currentColor" stroke-width="2"/><circle cx="32" cy="32" r="2" fill="currentColor"/><text x="32" y="27" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor">${escapeHtml(valueText)}</text></svg>`;
+  }
+
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="2"/><line x1="32" y1="32" x2="56" y2="32" stroke="currentColor" stroke-width="2"/><circle cx="32" cy="32" r="2" fill="currentColor"/><text x="44" y="27" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor">${escapeHtml(valueText)}</text></svg>`;
 }
 
 function renderAlgebraTextHTML(text) {

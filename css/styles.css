@@ -560,6 +560,15 @@ main {
   height: 100%;
 }
 
+.geometry-circle-diagram {
+  width: 8rem;
+  height: 8rem;
+}
+
+.geometry-circle-diagram svg text {
+  letter-spacing: 0.01em;
+}
+
 .geometry-topic-large-shape .geometry-shape-stack {
   gap: 0.7rem;
 }
