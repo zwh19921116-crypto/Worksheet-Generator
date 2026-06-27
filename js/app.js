@@ -71,6 +71,19 @@ const MODULE_TOPICS = {
     { value: 'unit-conversions', label: 'Unit Conversions' },
     { value: 'scale-drawings', label: 'Scale Drawings' },
   ],
+  statistics: [
+    { value: 'data-collection', label: 'Data Collection' },
+    { value: 'tables', label: 'Tables' },
+    { value: 'graphs', label: 'Graphs' },
+    { value: 'mean', label: 'Mean' },
+    { value: 'median', label: 'Median' },
+    { value: 'mode', label: 'Mode' },
+    { value: 'range', label: 'Range' },
+    { value: 'interquartile-range', label: 'Interquartile Range' },
+    { value: 'standard-deviation', label: 'Standard Deviation' },
+    { value: 'data-analysis', label: 'Data Analysis' },
+    { value: 'regression', label: 'Regression' },
+  ],
   trigonometry: [
     { value: 'right-angle-trigonometry', label: 'Right Angle Trigonometry' },
     { value: 'sine-rule', label: 'Sine Rule' },
@@ -195,6 +208,19 @@ const TRIGONOMETRY_TOPICS = new Set([
   'bearings',
   'applications-of-trigonometry',
 ]);
+const STATISTICS_TOPICS = new Set([
+  'data-collection',
+  'tables',
+  'graphs',
+  'mean',
+  'median',
+  'mode',
+  'range',
+  'interquartile-range',
+  'standard-deviation',
+  'data-analysis',
+  'regression',
+]);
 
 let allPages    = [];
 let currentPage = 0;
@@ -254,9 +280,6 @@ function defaultTitleSuffix() {
 }
 
 ensureTrigonometryModuleOption();
-if (moduleSelect.querySelector('option[value="trigonometry"]')) {
-  moduleSelect.value = 'trigonometry';
-}
 populateTopics();
 updateTopicControls();
 updateTitleInput(true);
@@ -317,6 +340,7 @@ function moduleLabel(module) {
     percentages: 'Percentages',
     geometry: 'Geometry',
     measurement: 'Measurement',
+    statistics: 'Statistics',
     trigonometry: 'Trigonometry',
     algebra: 'Algebra',
     number: 'Number',
@@ -357,6 +381,17 @@ function topicLabel(topic, timesTable) {
     'percentage-increase': 'Percentage Increase Practice',
     'percentage-decrease': 'Percentage Decrease Practice',
     'percentage-to-decimal': 'Percentage to Decimal Practice',
+    'data-collection': 'Data Collection Practice',
+    tables: 'Tables Practice',
+    graphs: 'Graphs Practice',
+    mean: 'Mean Practice',
+    median: 'Median Practice',
+    mode: 'Mode Practice',
+    range: 'Range Practice',
+    'interquartile-range': 'Interquartile Range Practice',
+    'standard-deviation': 'Standard Deviation Practice',
+    'data-analysis': 'Data Analysis Practice',
+    regression: 'Regression Practice',
     '2d-shapes': '2D Shapes Practice',
     '3d-shapes': '3D Shapes Practice',
     angles: 'Angles Practice',
@@ -639,6 +674,10 @@ function renderVerticalQuestion(num, question, symbol) {
     return renderMeasurementQuestion(num, question);
   }
 
+  if (question.kind === 'statistics') {
+    return renderStatisticsQuestion(num, question);
+  }
+
   if (question.kind === 'trigonometry') {
     return renderTrigonometryQuestion(num, question);
   }
@@ -752,6 +791,17 @@ function renderMeasurementQuestion(num, question) {
     </div>`;
 }
 
+function renderStatisticsQuestion(num, question) {
+  return `
+    <div class="question question-number-topic question-statistics-topic">
+      <div class="question-number">${num}.</div>
+      <div class="number-topic-body statistics-topic-body">
+        <div class="number-topic-prompt statistics-topic-prompt">${renderStatisticsPromptHTML(question)}</div>
+        <div class="number-topic-answer-line statistics-topic-answer-line"></div>
+      </div>
+    </div>`;
+}
+
 function renderTrigonometryQuestion(num, question) {
   return `
     <div class="question question-number-topic question-trigonometry-topic">
@@ -777,6 +827,12 @@ function renderTrigonometryPromptHTML(question) {
     </span>`;
 }
 
+function renderStatisticsPromptHTML(question) {
+  const dataHTML = question.data ? `<div class="statistics-topic-data">${escapeHtml(String(question.data))}</div>` : '';
+  const promptHTML = `<div class="statistics-topic-question">${escapeHtml(String(question.prompt ?? ''))}</div>`;
+  return `${dataHTML}${promptHTML}`;
+}
+
 function renderTrigonometryShapeSVG(question) {
   if (!TRIGONOMETRY_TOPICS.has(question.topic) || !question.shape) {
     return '';
@@ -784,25 +840,34 @@ function renderTrigonometryShapeSVG(question) {
 
   const dims = question.dimensions || {};
   const n = (value, suffix = '') => escapeHtml(`${value}${suffix}`);
+  const badge = (content, x, y, width, height, options = {}) => {
+    const rotate = options.rotate ?? 0;
+    const rectFill = options.fill ?? 'rgba(255,255,255,0.72)';
+    const rectStroke = options.stroke ?? 'rgba(43,108,176,0.35)';
+    const textFill = options.textFill ?? 'rgba(43,108,176,0.9)';
+    const fontSize = options.fontSize ?? 7.8;
+    const fontWeight = options.fontWeight ?? 600;
+    return `<g transform="translate(${x} ${y}) rotate(${rotate})"><rect x="${-width / 2}" y="${-height / 2}" width="${width}" height="${height}" rx="4" ry="4" fill="${rectFill}" stroke="${rectStroke}" stroke-width="0.7"/><text x="0" y="${Math.max(3, height * 0.32)}" text-anchor="middle" font-size="${fontSize}" font-weight="${fontWeight}" fill="${textFill}">${content}</text></g>`;
+  };
 
   if (question.shape === 'right-triangle') {
-    return `<svg viewBox="0 0 180 130" aria-hidden="true"><polygon points="30,102 140,102 140,34" fill="rgba(43,108,176,0.06)" stroke="currentColor" stroke-width="2.4"/><path d="M130 102 L130 92 L140 92" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M46 102 A16 16 0 0 0 43 94" fill="none" stroke="currentColor" stroke-width="1.9"/><text x="24" y="88" font-size="9.2" font-weight="700" fill="currentColor">${n(dims.angle, '°')}</text><text x="86" y="119" text-anchor="middle" font-size="9.6" font-weight="700" fill="currentColor">adj=?</text><text x="148" y="70" text-anchor="start" font-size="9.6" font-weight="700" fill="currentColor">opp=?</text><text x="80" y="60" text-anchor="middle" font-size="9.6" font-weight="700" fill="currentColor">hyp=${n(dims.hypotenuse, ' cm')}</text></svg>`;
+    return `<svg viewBox="0 0 180 130" aria-hidden="true"><polygon points="30,102 140,102 140,34" fill="rgba(43,108,176,0.06)" stroke="currentColor" stroke-width="2.4"/><path d="M130 102 L130 92 L140 92" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M46 102 A16 16 0 0 0 43 94" fill="none" stroke="currentColor" stroke-width="1.9"/><text x="30" y="82" font-size="9.2" font-weight="700" fill="currentColor">${n(dims.angle, '°')}</text>${badge('adj=?', 86, 112, 30, 12)}${badge('opp=?', 150, 66, 30, 12)}${badge(`hyp=${n(dims.hypotenuse, ' cm')}`, 86, 28, 50, 12)}</svg>`;
   }
 
   if (question.shape === 'sine-rule-triangle') {
-    return `<svg viewBox="0 0 180 130" aria-hidden="true"><polygon points="34,102 146,102 92,26" fill="rgba(43,108,176,0.06)" stroke="currentColor" stroke-width="2.3"/><text x="27" y="114" text-anchor="middle" font-size="8.7" font-weight="700" fill="currentColor">B</text><text x="153" y="114" text-anchor="middle" font-size="8.7" font-weight="700" fill="currentColor">C</text><text x="92" y="18" text-anchor="middle" font-size="8.7" font-weight="700" fill="currentColor">A</text><text x="90" y="122" text-anchor="middle" font-size="9.6" font-weight="700" fill="currentColor">a=${n(dims.sideA, ' cm')}</text><text x="126" y="62" text-anchor="start" font-size="9.6" font-weight="700" fill="currentColor">b=?</text><path d="M84 37 A14 14 0 0 1 100 37" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="92" y="12" text-anchor="middle" font-size="9.1" font-weight="700" fill="currentColor">A=${n(dims.angleA, '°')}</text><path d="M48 102 A14 14 0 0 0 42 92" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="10" y="90" font-size="9.1" font-weight="700" fill="currentColor">B=${n(dims.angleB, '°')}</text></svg>`;
+    return `<svg viewBox="0 0 180 130" aria-hidden="true"><polygon points="34,102 146,102 92,26" fill="rgba(43,108,176,0.06)" stroke="currentColor" stroke-width="2.3"/>${badge('B', 27, 114, 10, 10, { fontSize: 7.2, fontWeight: 700 })}${badge('C', 153, 114, 10, 10, { fontSize: 7.2, fontWeight: 700 })}${badge('A', 92, 18, 10, 10, { fontSize: 7.2, fontWeight: 700 })}${badge(`a=${n(dims.sideA, ' cm')}`, 90, 122, 36, 12)}${badge('b=?', 154, 58, 24, 12)}<path d="M84 37 A14 14 0 0 1 100 37" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="92" y="24" text-anchor="middle" font-size="9.1" font-weight="700" fill="currentColor">${n(dims.angleA, '°')}</text><path d="M48 102 A14 14 0 0 0 42 92" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="20" y="90" text-anchor="middle" font-size="9.1" font-weight="700" fill="currentColor">${n(dims.angleB, '°')}</text></svg>`;
   }
 
   if (question.shape === 'cosine-rule-triangle') {
-    return `<svg viewBox="0 0 180 130" aria-hidden="true"><polygon points="34,102 146,102 92,26" fill="rgba(43,108,176,0.06)" stroke="currentColor" stroke-width="2.3"/><text x="27" y="114" text-anchor="middle" font-size="8.7" font-weight="700" fill="currentColor">B</text><text x="153" y="114" text-anchor="middle" font-size="8.7" font-weight="700" fill="currentColor">C</text><text x="92" y="18" text-anchor="middle" font-size="8.7" font-weight="700" fill="currentColor">A</text><text x="90" y="122" text-anchor="middle" font-size="9.6" font-weight="700" fill="currentColor">a=?</text><text x="124" y="62" text-anchor="start" font-size="9.6" font-weight="700" fill="currentColor">b=${n(dims.sideB, ' cm')}</text><text x="58" y="62" text-anchor="end" font-size="9.6" font-weight="700" fill="currentColor">c=${n(dims.sideC, ' cm')}</text><path d="M84 37 A14 14 0 0 1 100 37" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="92" y="12" text-anchor="middle" font-size="9.1" font-weight="700" fill="currentColor">A=${n(dims.angleA, '°')}</text></svg>`;
+    return `<svg viewBox="0 0 180 130" aria-hidden="true"><polygon points="34,102 146,102 92,26" fill="rgba(43,108,176,0.06)" stroke="currentColor" stroke-width="2.3"/>${badge('B', 27, 114, 10, 10, { fontSize: 7.2, fontWeight: 700 })}${badge('C', 153, 114, 10, 10, { fontSize: 7.2, fontWeight: 700 })}${badge('A', 92, 18, 10, 10, { fontSize: 7.2, fontWeight: 700 })}${badge('a=?', 90, 122, 24, 12)}${badge(`b=${n(dims.sideB, ' cm')}`, 154, 58, 38, 12)}${badge(`c=${n(dims.sideC, ' cm')}`, 28, 48, 38, 12)}<path d="M84 37 A14 14 0 0 1 100 37" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="92" y="24" text-anchor="middle" font-size="9.1" font-weight="700" fill="currentColor">${n(dims.angleA, '°')}</text></svg>`;
   }
 
   if (question.shape === 'bearings-compass') {
-    return `<svg viewBox="0 0 180 130" aria-hidden="true"><circle cx="90" cy="66" r="31" fill="rgba(43,108,176,0.05)" stroke="currentColor" stroke-width="2.2"/><circle cx="90" cy="66" r="3" fill="currentColor"/><line x1="90" y1="35" x2="90" y2="16" stroke="currentColor" stroke-width="2.2"/><text x="90" y="12" text-anchor="middle" font-size="9.6" font-weight="700" fill="currentColor">N</text><line x1="90" y1="66" x2="118" y2="46" stroke="currentColor" stroke-width="2.2"/><text x="120" y="43" font-size="9" font-weight="700" fill="currentColor">B</text><text x="83" y="61" font-size="9" font-weight="700" fill="currentColor">A</text><path d="M90 50 A16 16 0 0 1 105 56" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="129" y="41" text-anchor="start" font-size="9.1" font-weight="700" fill="currentColor">${n(String(dims.bearingAB).padStart(3, '0'), '°')}</text><text x="22" y="116" text-anchor="start" font-size="9.6" font-weight="700" fill="currentColor">reverse: ?°</text></svg>`;
+    return `<svg viewBox="0 0 180 130" aria-hidden="true"><circle cx="90" cy="66" r="31" fill="rgba(43,108,176,0.05)" stroke="currentColor" stroke-width="2.2"/><circle cx="90" cy="66" r="3" fill="currentColor"/><line x1="90" y1="35" x2="90" y2="16" stroke="currentColor" stroke-width="2.2"/>${badge('N', 90, 12, 10, 10, { fontSize: 7.2, fontWeight: 700 })}<line x1="90" y1="66" x2="118" y2="46" stroke="currentColor" stroke-width="2.2"/>${badge('B', 120, 43, 10, 10, { fontSize: 7.2, fontWeight: 700 })}${badge('A', 83, 61, 10, 10, { fontSize: 7.2, fontWeight: 700 })}<path d="M90 50 A16 16 0 0 1 105 56" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="110" y="46" text-anchor="start" font-size="9.1" font-weight="700" fill="currentColor">${n(String(dims.bearingAB).padStart(3, '0'), '°')}</text>${badge('reverse: ?°', 32, 116, 44, 12)}</svg>`;
   }
 
   if (question.shape === 'ladder-application') {
-    return `<svg viewBox="0 0 180 130" aria-hidden="true"><line x1="24" y1="104" x2="154" y2="104" stroke="currentColor" stroke-width="2.3"/><line x1="132" y1="104" x2="132" y2="26" stroke="currentColor" stroke-width="2.3"/><line x1="36" y1="104" x2="132" y2="26" stroke="currentColor" stroke-width="2.6"/><path d="M52 104 A16 16 0 0 0 46 96" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="30" y="90" font-size="9.1" font-weight="700" fill="currentColor">${n(dims.angle, '°')}</text><text x="85" y="59" text-anchor="middle" font-size="9.6" font-weight="700" fill="currentColor">${n(dims.ladderLength, ' m')}</text><text x="138" y="67" text-anchor="start" font-size="9.6" font-weight="700" fill="currentColor">h=?</text></svg>`;
+    return `<svg viewBox="0 0 180 130" aria-hidden="true"><line x1="24" y1="104" x2="154" y2="104" stroke="currentColor" stroke-width="2.3"/><line x1="132" y1="104" x2="132" y2="26" stroke="currentColor" stroke-width="2.3"/><line x1="36" y1="104" x2="132" y2="26" stroke="currentColor" stroke-width="2.6"/><path d="M52 104 A16 16 0 0 0 46 96" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="18" y="88" font-size="9.1" font-weight="700" fill="currentColor">${n(dims.angle, '°')}</text>${badge(n(dims.ladderLength, ' m'), 84, 54, 28, 12, { fontSize: 7.4, fontWeight: 600, fill: 'rgba(255,255,255,0.72)', stroke: 'rgba(43,108,176,0.28)', textFill: 'rgba(43,108,176,0.82)' })}${badge('h=?', 142, 68, 22, 12)}</svg>`;
   }
 
   return '';
@@ -902,6 +967,10 @@ function renderSolutionHTML(question) {
       return `${escapeHtml(String(question.prompt ?? ''))} = ${escapeHtml(String(question.answer ?? ''))}`;
     }
 
+    if (question.kind === 'statistics') {
+      return `${renderStatisticsPromptHTML(question)} = ${escapeHtml(String(question.answer ?? ''))}`;
+    }
+
     if (question.kind === 'trigonometry') {
       return `${escapeHtml(String(question.prompt ?? ''))} = ${escapeHtml(String(question.answer ?? ''))}`;
     }
@@ -938,6 +1007,12 @@ function buildQuestions(topic, min, max, count, timesTable) {
   if (MEASUREMENT_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
       questions.push(buildMeasurementQuestion(topic, min, max));
+    }
+    return questions;
+  }
+  if (STATISTICS_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildStatisticsQuestion(topic, min, max));
     }
     return questions;
   }
@@ -1416,6 +1491,98 @@ function buildGeometryQuestion(topic) {
       };
   }
 }
+
+function buildStatisticsQuestion(topic, min, max) {
+    const parsedMin = Number.isFinite(min) ? min : 1;
+    const parsedMax = Number.isFinite(max) ? max : 12;
+    const safeMin = Math.max(1, Math.min(parsedMin, parsedMax));
+    const safeMax = Math.max(safeMin, Math.max(parsedMin, parsedMax));
+    const rangeInt = (minimumValue = 1) => {
+      const low = Math.max(minimumValue, safeMin);
+      const high = Math.max(low, safeMax);
+      return randomInt(low, high);
+    };
+
+    const values = Array.from({ length: randomInt(5, 8) }, () => rangeInt(0));
+    const sortedValues = [...values].sort((a, b) => a - b);
+    const dataString = values.join(', ');
+    const sum = values.reduce((total, value) => total + value, 0);
+    const mean = sum / values.length;
+    const middle = Math.floor(sortedValues.length / 2);
+    const median = sortedValues.length % 2 === 0
+      ? (sortedValues[middle - 1] + sortedValues[middle]) / 2
+      : sortedValues[middle];
+    const counts = new Map();
+    values.forEach((value) => counts.set(value, (counts.get(value) || 0) + 1));
+    const highestFrequency = Math.max(...counts.values());
+    const modes = [...counts.entries()].filter(([, frequency]) => frequency === highestFrequency).map(([value]) => value).sort((a, b) => a - b);
+    const rangeValue = Math.max(...values) - Math.min(...values);
+    const lowerHalf = sortedValues.slice(0, Math.floor(sortedValues.length / 2));
+    const upperHalf = sortedValues.slice(Math.ceil(sortedValues.length / 2));
+    const lowerQuartile = lowerHalf[Math.floor(lowerHalf.length / 2)] ?? sortedValues[0];
+    const upperQuartile = upperHalf[Math.floor(upperHalf.length / 2)] ?? sortedValues[sortedValues.length - 1];
+    const iqr = upperQuartile - lowerQuartile;
+    const meanSquared = values.reduce((total, value) => total + ((value - mean) ** 2), 0) / values.length;
+    const standardDeviation = Math.sqrt(meanSquared);
+
+    switch (topic) {
+      case 'data-collection': {
+        const scenarios = [
+          { prompt: 'What is the best way to collect data about students favourite sport?', answer: 'Survey' },
+          { prompt: 'What method would you use to collect data from a large school year group?', answer: 'Questionnaire' },
+          { prompt: 'What type of data collection would be quickest for a yes/no question?', answer: 'Survey' },
+          { prompt: 'Which method is best for asking people their opinion?', answer: 'Interview or survey' },
+        ];
+        const scenario = pickRandomFromList(scenarios);
+        return { kind: 'statistics', topic, prompt: scenario.prompt, answer: scenario.answer };
+      }
+      case 'tables': {
+        return { kind: 'statistics', topic, data: dataString, prompt: 'Use the data to complete the frequency table.', answer: 'Frequency table' };
+      }
+      case 'graphs': {
+        const graphTypes = [
+          { prompt: 'Which graph is best for comparing categories?', answer: 'Bar graph' },
+          { prompt: 'Which graph is best for showing change over time?', answer: 'Line graph' },
+          { prompt: 'Which graph is best for showing parts of a whole?', answer: 'Pie chart' },
+          { prompt: 'Which graph would you use for grouped data?', answer: 'Histogram' },
+        ];
+        const graph = pickRandomFromList(graphTypes);
+        return { kind: 'statistics', topic, prompt: graph.prompt, answer: graph.answer };
+      }
+      case 'mean':
+        return { kind: 'statistics', topic, data: dataString, prompt: 'Find the mean of the data set.', answer: formatDecimalResult(mean) };
+      case 'median':
+        return { kind: 'statistics', topic, data: dataString, prompt: 'Find the median of the data set.', answer: formatDecimalResult(median) };
+      case 'mode':
+        return { kind: 'statistics', topic, data: dataString, prompt: 'Find the mode of the data set.', answer: modes.length === 1 ? String(modes[0]) : modes.join(', ') };
+      case 'range':
+        return { kind: 'statistics', topic, data: dataString, prompt: 'Find the range of the data set.', answer: String(rangeValue) };
+      case 'interquartile-range':
+        return { kind: 'statistics', topic, data: dataString, prompt: 'Find the interquartile range of the data set.', answer: String(iqr) };
+      case 'standard-deviation':
+        return { kind: 'statistics', topic, data: dataString, prompt: 'Find the standard deviation of the data set.', answer: formatDecimalResult(standardDeviation) };
+      case 'data-analysis': {
+        const analysisQuestions = [
+          { prompt: 'What does the data suggest about the trend?', answer: 'Describe the pattern in the data' },
+          { prompt: 'Is there any outlier in the data set?', answer: 'State whether there is an outlier' },
+          { prompt: 'What conclusion can you make from the data?', answer: 'Write a reasonable conclusion' },
+        ];
+        const analysis = pickRandomFromList(analysisQuestions);
+        return { kind: 'statistics', topic, data: dataString, prompt: analysis.prompt, answer: analysis.answer };
+      }
+      case 'regression': {
+        const regressionTypes = [
+          { prompt: 'Does the scatter plot show positive, negative, or no correlation?', answer: 'Positive correlation' },
+          { prompt: 'What line is used to show the trend in a scatter plot?', answer: 'Line of best fit' },
+          { prompt: 'What type of relationship is shown by points rising from left to right?', answer: 'Positive correlation' },
+        ];
+        const regression = pickRandomFromList(regressionTypes);
+        return { kind: 'statistics', topic, prompt: regression.prompt, answer: regression.answer };
+      }
+      default:
+        return { kind: 'statistics', topic, prompt: 'Write the answer.', answer: '' };
+    }
+  }
 
 function buildMeasurementQuestion(topic, min, max) {
   const parsedMin = Number.isFinite(min) ? min : 1;
