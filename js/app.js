@@ -588,7 +588,7 @@ function renderSolutionHTML(question) {
     }
 
     if (question.kind === 'algebra') {
-      return `${renderAlgebraPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
+      return `${renderAlgebraPromptHTML(question)} = ${renderAlgebraTextHTML(String(question.answer))}`;
     }
 
     if (question.kind === 'percentage') {
@@ -936,9 +936,9 @@ function buildAlgebraQuestion(topic) {
       const variable = pickRandomFromList(['x', 'y', 'n', 'a']);
       const coefficient = randomInt(2, 9);
       const constant = randomInt(1, 12);
-      const phrase = randomInt(0, 1) === 0 ? `${coefficient} times ${variable} plus ${constant}` : `${constant} more than ${coefficient}${variable}`;
-      const answer = randomInt(0, 1) === 0 ? `${coefficient}${variable} + ${constant}` : `${coefficient}${variable} + ${constant}`;
-      return { kind: 'algebra', topic, prompt: `Write an expression for ${phrase}.`, answer };
+      const phrase = `${coefficient} times ${variable} plus ${constant}`;
+      const answer = `${coefficient}${variable} + ${constant}`;
+      return { kind: 'algebra', topic, prompt: phrase, answer };
     }
     case 'expressions': {
       const variable = pickRandomFromList(['x', 'y', 'n']);
@@ -948,7 +948,7 @@ function buildAlgebraQuestion(topic) {
       return {
         kind: 'algebra',
         topic,
-        prompt: `Simplify ${first}${variable} + ${second}${variable} + ${third}${variable}.`,
+        prompt: `${first}${variable} + ${second}${variable} + ${third}${variable}`,
         answer: `${first + second + third}${variable}`,
       };
     }
@@ -971,7 +971,7 @@ function buildAlgebraQuestion(topic) {
       return {
         kind: 'algebra',
         topic,
-        prompt: `Expand ${coefficient}(${variable} + ${constant}).`,
+        prompt: `${coefficient}(${variable} + ${constant})`,
         answer: `${coefficient}${variable} + ${coefficient * constant}`,
       };
     }
@@ -982,7 +982,7 @@ function buildAlgebraQuestion(topic) {
       return {
         kind: 'algebra',
         topic,
-        prompt: `Factorise ${coefficient}${variable} + ${coefficient * constant}.`,
+        prompt: `${coefficient}${variable} + ${coefficient * constant}`,
         answer: `${coefficient}(${variable} + ${constant})`,
       };
     }
@@ -993,7 +993,7 @@ function buildAlgebraQuestion(topic) {
       return {
         kind: 'algebra',
         topic,
-        prompt: `Solve ${variable} + ${constant} = ${solution + constant}.`,
+        prompt: `${variable} + ${constant} = ${solution + constant}`,
         answer: `${variable} = ${solution}`,
       };
     }
@@ -1018,7 +1018,7 @@ function buildAlgebraQuestion(topic) {
       return {
         kind: 'algebra',
         topic,
-        prompt: `Solve ${variable} + ${offset} ${comparison} ${rightSide}.`,
+        prompt: `${variable} + ${offset} ${comparison} ${rightSide}`,
         answer: `${variable} ${comparison} ${solution}`,
       };
     }
@@ -1052,7 +1052,7 @@ function buildAlgebraQuestion(topic) {
       return {
         kind: 'algebra',
         topic,
-        prompt: `Evaluate ${base}^${exponent}.`,
+        prompt: `${base}^${exponent}`,
         answer: Math.pow(base, exponent),
       };
     }
@@ -1062,7 +1062,7 @@ function buildAlgebraQuestion(topic) {
       return {
         kind: 'algebra',
         topic,
-        prompt: `Evaluate log10(${value}).`,
+        prompt: `log10(${value})`,
         answer: exponent,
       };
     }
@@ -1343,7 +1343,11 @@ function renderPercentagePromptHTML(question) {
 }
 
 function renderAlgebraPromptHTML(question) {
-  return escapeHtml(String(question.prompt ?? '')).replace(/\n/g, '<br>');
+  return renderAlgebraTextHTML(String(question.prompt ?? '')).replace(/\n/g, '<br>');
+}
+
+function renderAlgebraTextHTML(text) {
+  return escapeHtml(String(text)).replace(/\^(\d+)/g, '<sup>$1</sup>');
 }
 
 function renderDecimalSolutionText(question) {
