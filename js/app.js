@@ -50,6 +50,14 @@ const MODULE_TOPICS = {
   geometry: [
     { value: '2d-shapes', label: '2D Shapes' },
     { value: '3d-shapes', label: '3D Shapes' },
+    { value: 'angles', label: 'Angles' },
+    { value: 'symmetry', label: 'Symmetry' },
+    { value: 'transformations', label: 'Transformations' },
+    { value: 'congruence', label: 'Congruence' },
+    { value: 'similarity', label: 'Similarity' },
+    { value: 'circle-geometry', label: 'Circle Geometry' },
+    { value: 'geometric-reasoning', label: 'Geometric Reasoning' },
+    { value: 'proof', label: 'Proof' },
   ],
   algebra: [
     { value: 'patterns', label: 'Patterns' },
@@ -121,6 +129,14 @@ const PERCENTAGE_TOPICS = new Set([
 const GEOMETRY_TOPICS = new Set([
   '2d-shapes',
   '3d-shapes',
+  'angles',
+  'symmetry',
+  'transformations',
+  'congruence',
+  'similarity',
+  'circle-geometry',
+  'geometric-reasoning',
+  'proof',
 ]);
 
 const ALGEBRA_TOPICS = new Set([
@@ -286,6 +302,14 @@ function topicLabel(topic, timesTable) {
     'percentage-to-decimal': 'Percentage to Decimal Practice',
     '2d-shapes': '2D Shapes Practice',
     '3d-shapes': '3D Shapes Practice',
+    angles: 'Angles Practice',
+    symmetry: 'Symmetry Practice',
+    transformations: 'Transformations Practice',
+    congruence: 'Congruence Practice',
+    similarity: 'Similarity Practice',
+    'circle-geometry': 'Circle Geometry Practice',
+    'geometric-reasoning': 'Geometric Reasoning Practice',
+    proof: 'Proof Practice',
     patterns: 'Patterns Practice',
     variables: 'Variables Practice',
     expressions: 'Expressions Practice',
@@ -947,40 +971,148 @@ function buildPercentageQuestion(topic) {
 }
 
 function buildGeometryQuestion(topic) {
-  if (topic === '2d-shapes') {
-    const shapes2d = [
-      { name: 'Triangle', answer: '3 sides, 3 vertices' },
-      { name: 'Square', answer: '4 sides, 4 vertices' },
-      { name: 'Rectangle', answer: '4 sides, 4 vertices' },
-      { name: 'Pentagon', answer: '5 sides, 5 vertices' },
-      { name: 'Hexagon', answer: '6 sides, 6 vertices' },
-      { name: 'Octagon', answer: '8 sides, 8 vertices' },
-    ];
-    const shape = pickRandomFromList(shapes2d);
-    return {
-      kind: 'geometry',
-      topic,
-      prompt: shape.name,
-      answer: shape.answer,
-    };
+  switch (topic) {
+    case '2d-shapes': {
+      const shapes2d = [
+        { name: 'Triangle', answer: '3 sides, 3 vertices' },
+        { name: 'Square', answer: '4 sides, 4 vertices' },
+        { name: 'Rectangle', answer: '4 sides, 4 vertices' },
+        { name: 'Pentagon', answer: '5 sides, 5 vertices' },
+        { name: 'Hexagon', answer: '6 sides, 6 vertices' },
+        { name: 'Octagon', answer: '8 sides, 8 vertices' },
+      ];
+      const shape = pickRandomFromList(shapes2d);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: shape.name,
+        answer: shape.answer,
+      };
+    }
+    case '3d-shapes': {
+      const shapes3d = [
+        { name: 'Cube', answer: '6 faces, 12 edges, 8 vertices' },
+        { name: 'Cuboid', answer: '6 faces, 12 edges, 8 vertices' },
+        { name: 'Triangular Prism', answer: '5 faces, 9 edges, 6 vertices' },
+        { name: 'Square Pyramid', answer: '5 faces, 8 edges, 5 vertices' },
+        { name: 'Cylinder', answer: '3 faces, 2 edges, 0 vertices' },
+        { name: 'Cone', answer: '2 faces, 1 edge, 1 vertex' },
+        { name: 'Sphere', answer: '1 curved face, 0 edges, 0 vertices' },
+      ];
+      const shape = pickRandomFromList(shapes3d);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: shape.name,
+        answer: shape.answer,
+      };
+    }
+    case 'angles': {
+      const first = randomInt(30, 80);
+      const second = randomInt(20, 70);
+      const missing = 180 - first - second;
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: `${first}° + ${second}° + x = 180°`,
+        answer: `x = ${missing}°`,
+      };
+    }
+    case 'symmetry': {
+      const shapes = [
+        { name: 'Square', lines: 4 },
+        { name: 'Rectangle', lines: 2 },
+        { name: 'Equilateral Triangle', lines: 3 },
+        { name: 'Isosceles Triangle', lines: 1 },
+        { name: 'Regular Pentagon', lines: 5 },
+        { name: 'Regular Hexagon', lines: 6 },
+      ];
+      const shape = pickRandomFromList(shapes);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: shape.name,
+        answer: `${shape.lines} line(s) of symmetry`,
+      };
+    }
+    case 'transformations': {
+      const x = randomInt(-6, 6);
+      const y = randomInt(-6, 6);
+      const dx = randomInt(-4, 4);
+      const dy = randomInt(-4, 4);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: `A(${x}, ${y}) translated by (${dx}, ${dy})`,
+        answer: `A'(${x + dx}, ${y + dy})`,
+      };
+    }
+    case 'congruence': {
+      const a = randomInt(3, 10);
+      const b = randomInt(3, 10);
+      const c = randomInt(3, 10);
+      const congruent = randomInt(0, 1) === 0;
+      const d = congruent ? a : a + randomInt(1, 3);
+      const e = congruent ? b : b + randomInt(1, 3);
+      const f = congruent ? c : c + randomInt(1, 3);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: `△P: ${a}, ${b}, ${c} and △Q: ${d}, ${e}, ${f}`,
+        answer: congruent ? 'Congruent' : 'Not congruent',
+      };
+    }
+    case 'similarity': {
+      const side = randomInt(2, 14);
+      const scale = randomInt(2, 5);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: `Side ${side} cm at scale factor ${scale}`,
+        answer: `${side * scale} cm`,
+      };
+    }
+    case 'circle-geometry': {
+      const diameter = randomInt(4, 30);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: `Diameter = ${diameter} cm`,
+        answer: `Radius = ${diameter / 2} cm`,
+      };
+    }
+    case 'geometric-reasoning': {
+      const angle = randomInt(35, 145);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: `${angle}° + y = 180°`,
+        answer: `y = ${180 - angle}°`,
+      };
+    }
+    case 'proof': {
+      const statements = [
+        { prompt: 'Vertical opposite angles are equal.', answer: 'True' },
+        { prompt: 'A triangle can have two right angles.', answer: 'False' },
+        { prompt: 'All quadrilaterals have four equal sides.', answer: 'False' },
+        { prompt: 'Corresponding angles in parallel lines are equal.', answer: 'True' },
+      ];
+      const statement = pickRandomFromList(statements);
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: statement.prompt,
+        answer: statement.answer,
+      };
+    }
+    default:
+      return {
+        kind: 'geometry',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
   }
-
-  const shapes3d = [
-    { name: 'Cube', answer: '6 faces, 12 edges, 8 vertices' },
-    { name: 'Cuboid', answer: '6 faces, 12 edges, 8 vertices' },
-    { name: 'Triangular Prism', answer: '5 faces, 9 edges, 6 vertices' },
-    { name: 'Square Pyramid', answer: '5 faces, 8 edges, 5 vertices' },
-    { name: 'Cylinder', answer: '3 faces, 2 edges, 0 vertices' },
-    { name: 'Cone', answer: '2 faces, 1 edge, 1 vertex' },
-    { name: 'Sphere', answer: '1 curved face, 0 edges, 0 vertices' },
-  ];
-  const shape = pickRandomFromList(shapes3d);
-  return {
-    kind: 'geometry',
-    topic,
-    prompt: shape.name,
-    answer: shape.answer,
-  };
 }
 
 function buildAlgebraQuestion(topic) {
@@ -1581,6 +1713,38 @@ function getPageInstruction(topic) {
 
   if (topic === '3d-shapes') {
     return 'Write the number of faces, edges and vertices for each 3D shape:';
+  }
+
+  if (topic === 'angles') {
+    return 'Find the missing angle:';
+  }
+
+  if (topic === 'symmetry') {
+    return 'Write the number of lines of symmetry for each shape:';
+  }
+
+  if (topic === 'transformations') {
+    return 'Apply each transformation and write the new coordinate:';
+  }
+
+  if (topic === 'congruence') {
+    return 'Decide if the two triangles are congruent:';
+  }
+
+  if (topic === 'similarity') {
+    return 'Use similarity and scale factor to find the new side length:';
+  }
+
+  if (topic === 'circle-geometry') {
+    return 'Find the missing circle measure:';
+  }
+
+  if (topic === 'geometric-reasoning') {
+    return 'Use angle facts to find the missing value:';
+  }
+
+  if (topic === 'proof') {
+    return 'State whether each geometric statement is true or false:';
   }
 
   if (ALGEBRA_TOPICS.has(topic)) {
