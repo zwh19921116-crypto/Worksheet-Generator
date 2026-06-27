@@ -3,18 +3,29 @@
 //  app.js
 // ===========================
 
-const generateBtn   = document.getElementById('generateBtn');
-const printBtn      = document.getElementById('printBtn');
-const preview       = document.getElementById('worksheetPreview');
-const pagination    = document.getElementById('pagination');
-const prevBtn       = document.getElementById('prevBtn');
-const nextBtn       = document.getElementById('nextBtn');
-const pageIndicator = document.getElementById('pageIndicator');
+const generateBtn      = document.getElementById('generateBtn');
+const printBtn         = document.getElementById('printBtn');
+const preview          = document.getElementById('worksheetPreview');
+const pagination       = document.getElementById('pagination');
+const prevBtn          = document.getElementById('prevBtn');
+const nextBtn          = document.getElementById('nextBtn');
+const pageIndicator    = document.getElementById('pageIndicator');
+const topicSelect      = document.getElementById('topic');
+const timesTableGroup  = document.getElementById('timesTableGroup');
+const rangeRow         = document.getElementById('rangeRow');
 
-const QUESTIONS_PER_PAGE = 20; // fits neatly on one A4 page
+const QUESTIONS_PER_PAGE = 20;
 
-let allPages   = [];  // array of rendered page HTML strings
+let allPages    = [];
 let currentPage = 0;
+
+// Show/hide controls based on topic
+topicSelect.addEventListener('change', () => {
+  const topic = topicSelect.value;
+  const isTimesTable = topic === 'times-tables';
+  timesTableGroup.style.display = isTimesTable ? 'block' : 'none';
+  rangeRow.style.display        = isTimesTable ? 'none' : 'flex';
+});
 
 generateBtn.addEventListener('click', generateWorksheet);
 printBtn.addEventListener('click', () => window.print());
@@ -22,33 +33,46 @@ prevBtn.addEventListener('click', () => showPage(currentPage - 1));
 nextBtn.addEventListener('click', () => showPage(currentPage + 1));
 
 function generateWorksheet() {
-  const operation   = document.getElementById('operation').value;
+  const topic       = topicSelect.value;
   const minNum      = parseInt(document.getElementById('minNum').value, 10);
   const maxNum      = parseInt(document.getElementById('maxNum').value, 10);
   const numQ        = parseInt(document.getElementById('numQuestions').value, 10);
-  const title       = document.getElementById('title').value.trim() || 'Math Practice';
+  const timesTable  = parseInt(document.getElementById('timesTable').value, 10);
+  const title       = document.getElementById('title').value.trim() || topicLabel(topic, timesTable);
   const includeMeta = document.getElementById('studentName').checked;
 
-  if (minNum > maxNum) {
+  if (topic !== 'times-tables' && minNum > maxNum) {
     alert('Min Number cannot be greater than Max Number.');
     return;
   }
 
-  const questions = buildQuestions(operation, minNum, maxNum, numQ);
-  allPages = paginateQuestions(questions, title, operation, includeMeta);
+  const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable);
+  allPages = paginateQuestions(questions, title, topic, includeMeta);
   currentPage = 0;
   showPage(0);
   printBtn.disabled = false;
 }
 
-function paginateQuestions(questions, title, operation, includeMeta) {
+function topicLabel(topic, timesTable) {
+  const map = {
+    addition: 'Addition Practice',
+    subtraction: 'Subtraction Practice',
+    multiplication: 'Multiplication Practice',
+    division: 'Division Practice',
+    'times-tables': `${timesTable} Times Table`,
+    mixed: 'Mixed Operations Practice',
+  };
+  return map[topic] || 'Math Practice';
+}
+
+function paginateQuestions(questions, title, topic, includeMeta) {
   const pages = [];
   const totalPages = Math.ceil(questions.length / QUESTIONS_PER_PAGE);
 
   for (let p = 0; p < totalPages; p++) {
-    const slice = questions.slice(p * QUESTIONS_PER_PAGE, (p + 1) * QUESTIONS_PER_PAGE);
+    const slice    = questions.slice(p * QUESTIONS_PER_PAGE, (p + 1) * QUESTIONS_PER_PAGE);
     const startIdx = p * QUESTIONS_PER_PAGE;
-    pages.push(buildPageHTML(slice, startIdx, title, operation, includeMeta, p + 1, totalPages));
+    pages.push(buildPageHTML(slice, startIdx, title, includeMeta, p + 1, totalPages));
   }
   return pages;
 }
@@ -65,13 +89,14 @@ function showPage(index) {
   pagination.style.display = total > 1 ? 'flex' : 'none';
 }
 
-function buildPageHTML(questions, startIdx, title, operation, includeMeta, pageNum, totalPages) {
+function buildPageHTML(questions, startIdx, title, includeMeta, pageNum, totalPages) {
   const opSymbol = { addition: '+', subtraction: '−', multiplication: '×', division: '÷' };
-  const symbol   = opSymbol[operation];
 
-  let html = `<div class="a4-page">`;
+  const cols = 4;
+  const rows = Math.ceil(questions.length / cols);
+  let html = `<div class="a4-page" style="--q-rows:${rows}">`;
 
-  // Header (on every page)
+  // Header
   html += `<div class="worksheet-header"><h2>${escapeHtml(title)}</h2>`;
   if (includeMeta) {
     html += `<div class="meta-fields">
@@ -85,7 +110,8 @@ function buildPageHTML(questions, startIdx, title, operation, includeMeta, pageN
   // Questions grid
   html += `<div class="questions-grid">`;
   questions.forEach((q, idx) => {
-    const num = startIdx + idx + 1;
+    const num    = startIdx + idx + 1;
+    const symbol = opSymbol[q.operation];
     html += `<div class="question">${num}.&nbsp; ${q.a} ${symbol} ${q.b} = <span class="answer-line"></span></div>`;
   });
   html += `</div>`;
@@ -99,16 +125,35 @@ function buildPageHTML(questions, startIdx, title, operation, includeMeta, pageN
   return html;
 }
 
-function buildQuestions(operation, min, max, count) {
+function buildQuestions(topic, min, max, count, timesTable) {
+  const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
-  for (let i = 0; i < count; i++) {
-    let a = randomInt(min, max);
-    let b = randomInt(min, max);
 
-    if (operation === 'subtraction' && a < b) [a, b] = [b, a];
-    if (operation === 'division') {
-      b = randomInt(1, max);
-      a = b * randomInt(1, Math.max(1, Math.floor(max / b)));
+  for (let i = 0; i < count; i++) {
+    let operation, a, b;
+
+    if (topic === 'times-tables') {
+      operation = 'multiplication';
+      a = timesTable;
+      b = randomInt(1, 12);
+    } else if (topic === 'mixed') {
+      operation = mixedOps[randomInt(0, 3)];
+      a = randomInt(min, max);
+      b = randomInt(min, max);
+      if (operation === 'subtraction' && a < b) [a, b] = [b, a];
+      if (operation === 'division') {
+        b = randomInt(1, max);
+        a = b * randomInt(1, Math.max(1, Math.floor(max / b)));
+      }
+    } else {
+      operation = topic;
+      a = randomInt(min, max);
+      b = randomInt(min, max);
+      if (operation === 'subtraction' && a < b) [a, b] = [b, a];
+      if (operation === 'division') {
+        b = randomInt(1, max);
+        a = b * randomInt(1, Math.max(1, Math.floor(max / b)));
+      }
     }
 
     questions.push({ a, b, operation });

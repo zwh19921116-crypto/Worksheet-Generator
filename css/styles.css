@@ -39,11 +39,12 @@ header .subtitle {
 /* ---- Layout ---- */
 main {
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 1.5rem;
-  max-width: 1100px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+  grid-template-columns: 280px 1fr;
+  gap: 1.25rem;
+  max-width: 1200px;
+  margin: 1.5rem auto;
+  padding: 0 1.25rem;
+  align-items: start;
 }
 
 @media (max-width: 720px) {
@@ -56,29 +57,42 @@ main {
 .controls {
   background: #fff;
   border-radius: 10px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   height: fit-content;
+  position: sticky;
+  top: 1rem;
 }
 
 .controls h2 {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: #2b6cb0;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
   border-bottom: 2px solid #bee3f8;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Side-by-side row for min/max */
+.form-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
   color: #2d3748;
 }
 
@@ -86,10 +100,10 @@ main {
 .form-group input[type="text"],
 .form-group select {
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.6rem;
   border: 1px solid #cbd5e0;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: border-color 0.2s;
 }
 
@@ -109,8 +123,8 @@ main {
 .button-group {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1.25rem;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .btn-primary,
@@ -213,23 +227,24 @@ main {
 .a4-page {
   background: #fff;
   width: 210mm;
-  min-height: 297mm;
-  padding: 15mm 18mm;
+  height: 297mm;
+  padding: 12mm 16mm;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   font-family: 'Segoe UI', sans-serif;
   display: flex;
   flex-direction: column;
-  position: relative;
+  overflow: hidden;
 }
 
 /* ---- Worksheet Header ---- */
 .worksheet-header {
   text-align: center;
-  margin-bottom: 8mm;
+  margin-bottom: 5mm;
+  flex-shrink: 0;
 }
 
 .worksheet-header h2 {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #1a202c;
 }
@@ -237,8 +252,8 @@ main {
 .meta-fields {
   display: flex;
   justify-content: space-between;
-  margin-top: 5mm;
-  font-size: 0.9rem;
+  margin-top: 3mm;
+  font-size: 0.85rem;
   color: #4a5568;
   gap: 1rem;
 }
@@ -246,27 +261,29 @@ main {
 .meta-field {
   display: inline-block;
   border-bottom: 1.5px solid #4a5568;
-  min-width: 120px;
-  padding-bottom: 2px;
+  min-width: 100px;
+  padding-bottom: 1px;
 }
 
 /* ---- Questions Grid ---- */
+/* Stretches to fill the remaining page height and distributes rows evenly */
 .questions-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 5mm 6mm;
-  margin-top: 6mm;
+  grid-auto-rows: 1fr;
+  gap: 3mm 5mm;
+  margin-top: 4mm;
   flex: 1;
+  min-height: 0;
 }
 
 .question {
   background: #f7fafc;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  padding: 4mm 5mm;
+  padding: 2mm 4mm;
   font-size: 1rem;
   text-align: center;
-  min-height: 14mm;
   display: flex;
   align-items: center;
   justify-content: center;

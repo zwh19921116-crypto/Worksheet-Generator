@@ -17,28 +17,52 @@
       <h2>Worksheet Settings</h2>
 
       <div class="form-group">
-        <label for="operation">Operation</label>
-        <select id="operation">
-          <option value="addition">Addition (+)</option>
-          <option value="subtraction">Subtraction (−)</option>
-          <option value="multiplication">Multiplication (×)</option>
-          <option value="division">Division (÷)</option>
+        <label for="topic">Topic</label>
+        <select id="topic">
+          <optgroup label="Basic Operations">
+            <option value="addition">Addition (+)</option>
+            <option value="subtraction">Subtraction (−)</option>
+            <option value="multiplication">Multiplication (×)</option>
+            <option value="division">Division (÷)</option>
+          </optgroup>
+          <optgroup label="Practice Sets">
+            <option value="times-tables">Times Tables</option>
+            <option value="mixed">Mixed Operations</option>
+          </optgroup>
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" id="timesTableGroup" style="display:none">
+        <label for="timesTable">Times Table</label>
+        <select id="timesTable">
+          <option value="2">2 times table</option>
+          <option value="3">3 times table</option>
+          <option value="4">4 times table</option>
+          <option value="5">5 times table</option>
+          <option value="6">6 times table</option>
+          <option value="7">7 times table</option>
+          <option value="8">8 times table</option>
+          <option value="9">9 times table</option>
+          <option value="10">10 times table</option>
+          <option value="11">11 times table</option>
+          <option value="12">12 times table</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="rangeGroup">
         <label for="minNum">Min Number</label>
         <input type="number" id="minNum" value="1" min="0" max="999" />
       </div>
 
-      <div class="form-group">
-        <label for="maxNum">Max Number</label>
-        <input type="number" id="maxNum" value="12" min="1" max="999" />
-      </div>
-
-      <div class="form-group">
-        <label for="numQuestions">Number of Questions</label>
-        <input type="number" id="numQuestions" value="20" min="1" max="100" />
+      <div class="form-row" id="rangeRow">
+        <div class="form-group" id="rangeGroup">
+          <label for="minNum">Min</label>
+          <input type="number" id="minNum" value="1" min="0" max="999" />
+        </div>
+        <div class="form-group" id="rangeGroupMax">
+          <label for="maxNum">Max</label>
+          <input type="number" id="maxNum" value="12" min="1" max="999" />
+        </div>
       </div>
 
       <div class="form-group">
