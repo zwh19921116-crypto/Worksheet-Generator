@@ -216,6 +216,17 @@ titleInput.addEventListener('input', () => {
   titleTouched = titleInput.value.trim() !== defaultTitleSuffix();
 });
 
+function ensureTrigonometryModuleOption() {
+  if (!moduleSelect || moduleSelect.querySelector('option[value="trigonometry"]')) {
+    return;
+  }
+
+  const option = document.createElement('option');
+  option.value = 'trigonometry';
+  option.textContent = 'Trigonometry';
+  moduleSelect.appendChild(option);
+}
+
 function populateTopics() {
   const topics = MODULE_TOPICS[moduleSelect.value] || [];
   topicSelect.innerHTML = topics
@@ -242,6 +253,10 @@ function defaultTitleSuffix() {
   return `${moduleLabel(moduleSelect.value)} - ${topicLabel(topicSelect.value, parseInt(document.getElementById('timesTable').value, 10))}`;
 }
 
+ensureTrigonometryModuleOption();
+if (moduleSelect.querySelector('option[value="trigonometry"]')) {
+  moduleSelect.value = 'trigonometry';
+}
 populateTopics();
 updateTopicControls();
 updateTitleInput(true);
