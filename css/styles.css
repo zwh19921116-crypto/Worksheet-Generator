@@ -432,6 +432,54 @@ main {
   border-bottom: 2px solid #2b6cb0;
 }
 
+.question-fraction-topic {
+  min-height: 100%;
+  align-items: flex-start;
+}
+
+.fraction-topic-body {
+  margin: 1rem auto 0;
+  width: 100%;
+  max-width: 9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.fraction-topic-prompt {
+  font-size: 1rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.fraction-topic-answer-line {
+  width: 100%;
+  min-height: 1.8rem;
+  margin-top: 0.85rem;
+  border-bottom: 2px solid #2b6cb0;
+}
+
+.fraction-inline {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1;
+  min-width: 1.1rem;
+}
+
+.fraction-numerator,
+.fraction-denominator {
+  font-size: 0.82em;
+  font-variant-numeric: tabular-nums;
+}
+
+.fraction-line {
+  width: 100%;
+  border-top: 1.5px solid currentColor;
+  margin: 0.12rem 0;
+}
+
 .long-division {
   width: max-content;
   max-width: none;

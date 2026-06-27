@@ -28,6 +28,16 @@ const MODULE_TOPICS = {
     { value: 'bodmas', label: 'B.O.D.M.A.S' },
     { value: 'mixed', label: 'Mixed Operations' },
   ],
+  fractions: [
+    { value: 'equivalent-fractions', label: 'Equivalent Fractions' },
+    { value: 'simplifying-fractions', label: 'Simplifying Fractions' },
+    { value: 'mixed-fractions', label: 'Mixed Fractions' },
+    { value: 'improper-fractions', label: 'Improper Fractions' },
+    { value: 'add-fractions', label: 'Add Fractions' },
+    { value: 'subtract-fractions', label: 'Subtract Fractions' },
+    { value: 'multiply-fractions', label: 'Multiply Fractions' },
+    { value: 'divide-fractions', label: 'Divide Fractions' },
+  ],
   number: [
     { value: 'whole-numbers', label: 'Whole Numbers' },
     { value: 'place-value', label: 'Place Value' },
@@ -55,6 +65,17 @@ const NUMBER_TOPICS = new Set([
   'indices',
   'scientific-notation',
   'surds',
+]);
+
+const FRACTION_TOPICS = new Set([
+  'equivalent-fractions',
+  'simplifying-fractions',
+  'mixed-fractions',
+  'improper-fractions',
+  'add-fractions',
+  'subtract-fractions',
+  'multiply-fractions',
+  'divide-fractions',
 ]);
 
 let allPages    = [];
@@ -158,6 +179,7 @@ function renderWorksheetPages(questions) {
 function moduleLabel(module) {
   const map = {
     arithmetic: 'Arithmetic',
+    fractions: 'Fractions',
     number: 'Number',
   };
   return map[module] || 'Mathematics';
@@ -183,6 +205,14 @@ function topicLabel(topic, timesTable) {
     indices: 'Indices Practice',
     'scientific-notation': 'Scientific Notation Practice',
     surds: 'Surds Practice',
+    'equivalent-fractions': 'Equivalent Fractions Practice',
+    'simplifying-fractions': 'Simplifying Fractions Practice',
+    'mixed-fractions': 'Mixed Fractions Practice',
+    'improper-fractions': 'Improper Fractions Practice',
+    'add-fractions': 'Add Fractions Practice',
+    'subtract-fractions': 'Subtract Fractions Practice',
+    'multiply-fractions': 'Multiply Fractions Practice',
+    'divide-fractions': 'Divide Fractions Practice',
   };
   return map[topic] || 'Math Practice';
 }
@@ -241,6 +271,7 @@ function getQuestionsPerPage(questions) {
   const multiplicationOnly = questions.length > 0 && questions.every((question) => question.operation === 'multiplication');
   const bodmasOnly = questions.length > 0 && questions.every((question) => question.operation === 'bodmas');
   const numberOnly = questions.length > 0 && questions.every((question) => question.kind === 'number');
+  const fractionOnly = questions.length > 0 && questions.every((question) => question.kind === 'fraction');
   const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
 
   if (bodmasOnly) {
@@ -248,6 +279,10 @@ function getQuestionsPerPage(questions) {
   }
 
   if (numberOnly) {
+    return 8;
+  }
+
+  if (fractionOnly) {
     return 8;
   }
 
@@ -337,6 +372,10 @@ function formatSolution(question) {
     return `${question.prompt} = ${question.answer}`;
   }
 
+  if (question.kind === 'fraction') {
+    return `${question.prompt} = ${question.answer}`;
+  }
+
   switch (question.operation) {
     case 'addition':
       return `${question.a} + ${question.b} = ${question.a + question.b}`;
@@ -356,6 +395,10 @@ function formatSolution(question) {
 function renderVerticalQuestion(num, question, symbol) {
   if (question.kind === 'number') {
     return renderNumberQuestion(num, question);
+  }
+
+  if (question.kind === 'fraction') {
+    return renderFractionQuestion(num, question);
   }
 
   if (question.operation === 'bodmas') {
@@ -415,8 +458,22 @@ function renderNumberQuestion(num, question) {
     </div>`;
 }
 
+function renderFractionQuestion(num, question) {
+  return `
+    <div class="question question-fraction-topic">
+      <div class="question-number">${num}.</div>
+      <div class="fraction-topic-body">
+        <div class="fraction-topic-prompt">${escapeHtml(question.prompt)}</div>
+        <div class="fraction-topic-answer-line"></div>
+      </div>
+    </div>`;
+}
+
 function renderSolutionHTML(question) {
   if (question.kind !== 'number') {
+    if (question.kind === 'fraction') {
+      return `${escapeHtml(question.prompt)} = ${renderFractionValueHTML(question.answer)}`;
+    }
     return escapeHtml(formatSolution(question));
   }
 
@@ -434,6 +491,13 @@ function renderSolutionHTML(question) {
 function buildQuestions(topic, min, max, count, timesTable) {
   const mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
   const questions = [];
+
+  if (FRACTION_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildFractionQuestion(topic));
+    }
+    return questions;
+  }
 
   if (NUMBER_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
@@ -526,6 +590,104 @@ function buildBodmasQuestion(min, max) {
         answer: a + (dividend / divisor),
       };
     }
+  }
+}
+
+function buildFractionQuestion(topic) {
+  switch (topic) {
+    case 'equivalent-fractions': {
+      const fraction = createProperFraction();
+      const multiplier = randomInt(2, 5);
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `Write an equivalent fraction for ${fractionToText(fraction)}.`,
+        answer: fractionToText({ numerator: fraction.numerator * multiplier, denominator: fraction.denominator * multiplier }),
+      };
+    }
+    case 'simplifying-fractions': {
+      const simplified = createProperFraction(true);
+      const multiplier = randomInt(2, 5);
+      const unsimplified = {
+        numerator: simplified.numerator * multiplier,
+        denominator: simplified.denominator * multiplier,
+      };
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `Simplify ${fractionToText(unsimplified)}.`,
+        answer: fractionToText(simplified),
+      };
+    }
+    case 'mixed-fractions': {
+      const whole = randomInt(1, 9);
+      const fraction = createProperFraction();
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `Convert ${fractionToText({ numerator: whole * fraction.denominator + fraction.numerator, denominator: fraction.denominator })} to a mixed fraction.`,
+        answer: formatMixedFraction(whole, fraction.numerator, fraction.denominator),
+      };
+    }
+    case 'improper-fractions': {
+      const whole = randomInt(1, 9);
+      const fraction = createProperFraction();
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `Convert ${formatMixedFraction(whole, fraction.numerator, fraction.denominator)} to an improper fraction.`,
+        answer: fractionToText({ numerator: whole * fraction.denominator + fraction.numerator, denominator: fraction.denominator }),
+      };
+    }
+    case 'add-fractions': {
+      const denominator = randomInt(2, 12);
+      const first = randomInt(1, denominator - 1);
+      const second = randomInt(1, denominator - first);
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `${fractionToText({ numerator: first, denominator })} + ${fractionToText({ numerator: second, denominator })}`,
+        answer: reduceFraction(first + second, denominator),
+      };
+    }
+    case 'subtract-fractions': {
+      const denominator = randomInt(3, 12);
+      const first = randomInt(2, denominator - 1);
+      const second = randomInt(1, first - 1);
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `${fractionToText({ numerator: first, denominator })} - ${fractionToText({ numerator: second, denominator })}`,
+        answer: reduceFraction(first - second, denominator),
+      };
+    }
+    case 'multiply-fractions': {
+      const first = createProperFraction();
+      const second = createProperFraction();
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `${fractionToText(first)} × ${fractionToText(second)}`,
+        answer: reduceFraction(first.numerator * second.numerator, first.denominator * second.denominator),
+      };
+    }
+    case 'divide-fractions': {
+      const first = createProperFraction();
+      const second = createProperFraction();
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: `${fractionToText(first)} ÷ ${fractionToText(second)}`,
+        answer: reduceFraction(first.numerator * second.denominator, first.denominator * second.numerator),
+      };
+    }
+    default:
+      return {
+        kind: 'fraction',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
   }
 }
 
@@ -672,6 +834,55 @@ function uniqueRandomValues(count, min, max) {
 
 function pickRandomFromList(list) {
   return list[randomInt(0, list.length - 1)];
+}
+
+function createProperFraction(alreadyReduced = false) {
+  let denominator = randomInt(2, 12);
+  let numerator = randomInt(1, denominator - 1);
+
+  if (alreadyReduced) {
+    while (gcd(numerator, denominator) !== 1) {
+      denominator = randomInt(2, 12);
+      numerator = randomInt(1, denominator - 1);
+    }
+  }
+
+  return { numerator, denominator };
+}
+
+function fractionToText(fraction) {
+  return `${fraction.numerator}/${fraction.denominator}`;
+}
+
+function formatMixedFraction(whole, numerator, denominator) {
+  return `${whole} ${numerator}/${denominator}`;
+}
+
+function reduceFraction(numerator, denominator) {
+  const divisor = gcd(Math.abs(numerator), Math.abs(denominator));
+  numerator = numerator / divisor;
+  denominator = denominator / divisor;
+  if (denominator < 0) {
+    numerator = -numerator;
+    denominator = -denominator;
+  }
+  return fractionToText({ numerator, denominator });
+}
+
+function gcd(a, b) {
+  while (b !== 0) {
+    [a, b] = [b, a % b];
+  }
+  return a || 1;
+}
+
+function renderFractionValueHTML(value) {
+  const match = String(value).match(/^(\d+)\/(\d+)$/);
+  if (!match) {
+    return escapeHtml(String(value));
+  }
+
+  return `<span class="fraction-inline"><span class="fraction-numerator">${escapeHtml(match[1])}</span><span class="fraction-line"></span><span class="fraction-denominator">${escapeHtml(match[2])}</span></span>`;
 }
 
 function buildUniquePlaceValueDigits(length, targetIndex, targetDigit) {
