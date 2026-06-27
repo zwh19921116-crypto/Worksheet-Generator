@@ -421,6 +421,8 @@ function getQuestionsPerPage(questions) {
   const fractionOnly = questions.length > 0 && questions.every((question) => question.kind === 'fraction');
   const geometryShapesOnly = questions.length > 0 && questions.every((question) => question.kind === 'geometry' && (question.topic === '2d-shapes' || question.topic === '3d-shapes'));
   const measurementAreaPerimeterOnly = questions.length > 0 && questions.every((question) => question.kind === 'measurement' && (question.topic === 'area' || question.topic === 'perimeter'));
+  const measurementVolumeOnly = questions.length > 0 && questions.every((question) => question.kind === 'measurement' && question.topic === 'volume');
+  const measurementSurfaceAreaOnly = questions.length > 0 && questions.every((question) => question.kind === 'measurement' && question.topic === 'surface-area');
   const hasDoubleDigitByDoubleDigit = questions.some((question) => question.a >= 10 && question.b >= 10);
 
   if (geometryShapesOnly) {
@@ -428,6 +430,14 @@ function getQuestionsPerPage(questions) {
   }
 
   if (measurementAreaPerimeterOnly) {
+    return 4;
+  }
+
+  if (measurementVolumeOnly) {
+    return 4;
+  }
+
+  if (measurementSurfaceAreaOnly) {
     return 4;
   }
 
@@ -672,14 +682,7 @@ function renderDecimalQuestion(num, question) {
 }
 
 function renderMeasurementQuestion(num, question) {
-  const inlineMeasurementTopics = new Set([
-    'length',
-    'capacity',
-    'mass',
-    'time',
-    'unit-conversions',
-    'scale-drawings',
-  ]);
+  const inlineMeasurementTopics = new Set();
 
   if (inlineMeasurementTopics.has(question.topic)) {
     return `
@@ -1311,7 +1314,7 @@ function buildMeasurementQuestion(topic, min, max) {
       return {
         kind: 'measurement',
         topic,
-        prompt: `Convert ${meters} m to cm`,
+        prompt: `${meters} m to cm`,
         answer: `${meters * 100} cm`,
       };
     }
@@ -1551,7 +1554,7 @@ function buildMeasurementQuestion(topic, min, max) {
       return {
         kind: 'measurement',
         topic,
-        prompt: `Scale 1:${scale}. Real length ${realMeters} m. Find drawing length in cm`,
+        prompt: `Scale 1:${scale}, real ${realMeters} m -> ? cm`,
         answer: `${formatDecimalResult(drawingCm)} cm`,
       };
     }
