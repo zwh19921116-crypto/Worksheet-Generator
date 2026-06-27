@@ -601,10 +601,35 @@ main {
 .trigonometry-shape-icon {
   width: 12.5rem;
   height: 10rem;
+  border: 1px solid rgba(43, 108, 176, 0.25);
+  border-radius: 0.6rem;
+  background: linear-gradient(180deg, rgba(235, 244, 255, 0.65), rgba(247, 250, 252, 0.9));
+  padding: 0.35rem;
 }
 
 .trigonometry-shape-stack {
-  gap: 0.85rem;
+  gap: 0.95rem;
+}
+
+.trigonometry-shape-question {
+  font-size: 1rem;
+  line-height: 1.36;
+}
+
+.trigonometry-topic-body {
+  max-width: 12rem;
+}
+
+.trigonometry-topic-prompt {
+  font-weight: 700;
+}
+
+.trigonometry-topic-answer-line {
+  margin-top: 0.95rem;
+}
+
+.trigonometry-shape-icon svg text {
+  letter-spacing: 0.012em;
 }
 
 .measurement-shape-icon svg text {
