@@ -116,11 +116,7 @@ function paginateQuestions(questions, title, module, includeMeta) {
 }
 
 function getQuestionsPerPage(questions) {
-  const hasDivision = questions.some((question) => question.operation === 'division');
-  if (hasDivision) {
-    return 6;
-  }
-  return 8;
+  return 10;
 }
 
 function showPage(index) {
