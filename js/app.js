@@ -4,6 +4,7 @@
 // ===========================
 
 const generateBtn      = document.getElementById('generateBtn');
+const refreshBtn       = document.getElementById('refreshBtn');
 const printBtn         = document.getElementById('printBtn');
 const preview          = document.getElementById('worksheetPreview');
 const pagination       = document.getElementById('pagination');
@@ -30,6 +31,7 @@ const MODULE_TOPICS = {
 
 let allPages    = [];
 let currentPage = 0;
+let lastGeneratedQuestions = [];
 let titleTouched = false;
 
 moduleSelect.addEventListener('change', () => {
@@ -78,6 +80,7 @@ updateTopicControls();
 updateTitleInput(true);
 
 generateBtn.addEventListener('click', generateWorksheet);
+refreshBtn.addEventListener('click', refreshWorksheet);
 printBtn.addEventListener('click', () => window.print());
 prevBtn.addEventListener('click', () => showPage(currentPage - 1));
 nextBtn.addEventListener('click', () => showPage(currentPage + 1));
@@ -99,6 +102,25 @@ function generateWorksheet() {
   }
 
   const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable);
+  lastGeneratedQuestions = questions;
+  renderWorksheetPages(questions);
+}
+
+function refreshWorksheet() {
+  if (lastGeneratedQuestions.length === 0) {
+    generateWorksheet();
+    return;
+  }
+
+  renderWorksheetPages(lastGeneratedQuestions);
+}
+
+function renderWorksheetPages(questions) {
+  const module      = moduleSelect.value;
+  const titleSuffix = titleInput.value.trim() || defaultTitleSuffix();
+  const title       = `Edgeducate: ${titleSuffix}`;
+  const includeSolutions = solutionsCheckbox.checked;
+
   allPages = paginateQuestions(questions, title, module, includeSolutions);
   currentPage = 0;
   showPage(0);
