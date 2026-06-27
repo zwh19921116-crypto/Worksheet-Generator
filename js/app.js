@@ -14,6 +14,7 @@ const moduleSelect     = document.getElementById('module');
 const topicSelect      = document.getElementById('topic');
 const timesTableGroup  = document.getElementById('timesTableGroup');
 const rangeRow         = document.getElementById('rangeRow');
+const titleInput       = document.getElementById('title');
 
 const MODULE_TOPICS = {
   arithmetic: [
@@ -28,14 +29,21 @@ const MODULE_TOPICS = {
 
 let allPages    = [];
 let currentPage = 0;
+let titleTouched = false;
 
 moduleSelect.addEventListener('change', () => {
   populateTopics();
   updateTopicControls();
+  updateTitleInput();
 });
 
 topicSelect.addEventListener('change', () => {
   updateTopicControls();
+  updateTitleInput();
+});
+
+titleInput.addEventListener('input', () => {
+  titleTouched = titleInput.value.trim() !== defaultTitleSuffix();
 });
 
 function populateTopics() {
@@ -53,8 +61,20 @@ function updateTopicControls() {
   rangeRow.style.display        = isTimesTable ? 'none' : 'flex';
 }
 
+function updateTitleInput(force = false) {
+  if (!titleTouched || force) {
+    titleInput.value = defaultTitleSuffix();
+    titleTouched = false;
+  }
+}
+
+function defaultTitleSuffix() {
+  return `${moduleLabel(moduleSelect.value)} - ${topicLabel(topicSelect.value, parseInt(document.getElementById('timesTable').value, 10))}`;
+}
+
 populateTopics();
 updateTopicControls();
+updateTitleInput(true);
 
 generateBtn.addEventListener('click', generateWorksheet);
 printBtn.addEventListener('click', () => window.print());
@@ -68,7 +88,8 @@ function generateWorksheet() {
   const maxNum      = parseInt(document.getElementById('maxNum').value, 10);
   const numQ        = parseInt(document.getElementById('numQuestions').value, 10);
   const timesTable  = parseInt(document.getElementById('timesTable').value, 10);
-  const title       = document.getElementById('title').value.trim() || topicLabel(topic, timesTable);
+  const titleSuffix = titleInput.value.trim() || defaultTitleSuffix();
+  const title       = `Edgeducate: ${titleSuffix}`;
   const includeMeta = document.getElementById('studentName').checked;
 
   if (topic !== 'times-tables' && minNum > maxNum) {
@@ -191,11 +212,9 @@ function renderLongDivisionQuestion(num, question) {
     <div class="question question-long-division">
       <div class="question-number">${num}.</div>
       <div class="long-division">
+        <div class="long-division-answer"></div>
         <div class="long-division-divisor">${question.b}</div>
-        <div class="long-division-work">
-          <div class="long-division-answer"></div>
-          <div class="long-division-dividend">${question.a}</div>
-        </div>
+        <div class="long-division-dividend">${question.a}</div>
       </div>
     </div>`;
 }
