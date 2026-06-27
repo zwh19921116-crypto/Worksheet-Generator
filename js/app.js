@@ -421,7 +421,7 @@ function renderSolutionHTML(question) {
   }
 
   if (isYesNoNumberQuestion(question)) {
-    return `${renderNumberPromptHTML(question)} = Yes`;
+    return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
   }
 
   return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
@@ -578,21 +578,23 @@ function buildNumberQuestion(topic, min, max) {
       };
     }
     case 'prime-numbers': {
-      const value = pickRandomFromList(PRIME_NUMBERS);
+      const isPrimeQuestion = randomInt(0, 1) === 0;
+      const value = isPrimeQuestion ? pickRandomFromList(PRIME_NUMBERS) : pickNonPrimeNumber();
       return {
         kind: 'number',
         topic,
         prompt: `Is ${value} a prime number?`,
-        answer: 'Yes',
+        answer: isPrimeQuestion ? 'Yes' : 'No',
       };
     }
     case 'composite-numbers': {
-      const value = pickRandomFromList(COMPOSITE_NUMBERS);
+      const isCompositeQuestion = randomInt(0, 1) === 0;
+      const value = isCompositeQuestion ? pickRandomFromList(COMPOSITE_NUMBERS) : pickNonCompositeNumber();
       return {
         kind: 'number',
         topic,
         prompt: `Is ${value} a composite number?`,
-        answer: 'Yes',
+        answer: isCompositeQuestion ? 'Yes' : 'No',
       };
     }
     case 'integers': {
@@ -664,6 +666,16 @@ function uniqueRandomValues(count, min, max) {
 
 function pickRandomFromList(list) {
   return list[randomInt(0, list.length - 1)];
+}
+
+function pickNonPrimeNumber() {
+  const candidates = [1].concat(COMPOSITE_NUMBERS);
+  return pickRandomFromList(candidates);
+}
+
+function pickNonCompositeNumber() {
+  const candidates = [1].concat(PRIME_NUMBERS);
+  return pickRandomFromList(candidates);
 }
 
 function isPrime(value) {
