@@ -91,7 +91,6 @@ function generateWorksheet() {
   const timesTable  = parseInt(document.getElementById('timesTable').value, 10);
   const titleSuffix = titleInput.value.trim() || defaultTitleSuffix();
   const title       = `Edgeducate: ${titleSuffix}`;
-  const includeMeta = document.getElementById('studentName').checked;
   const includeSolutions = solutionsCheckbox.checked;
 
   if (topic !== 'times-tables' && minNum > maxNum) {
@@ -100,7 +99,7 @@ function generateWorksheet() {
   }
 
   const questions = buildQuestions(topic, minNum, maxNum, numQ, timesTable);
-  allPages = paginateQuestions(questions, title, module, includeMeta, includeSolutions);
+  allPages = paginateQuestions(questions, title, module, includeSolutions);
   currentPage = 0;
   showPage(0);
   printBtn.disabled = false;
@@ -125,7 +124,7 @@ function topicLabel(topic, timesTable) {
   return map[topic] || 'Math Practice';
 }
 
-function paginateQuestions(questions, title, module, includeMeta, includeSolutions) {
+function paginateQuestions(questions, title, module, includeSolutions) {
   const pageModels = [];
   const questionsPerPage = getQuestionsPerPage(questions);
   const worksheetPageCount = Math.ceil(questions.length / questionsPerPage);
@@ -139,7 +138,6 @@ function paginateQuestions(questions, title, module, includeMeta, includeSolutio
       startIdx,
       title,
       module,
-      includeMeta,
     });
   }
 
@@ -170,7 +168,6 @@ function paginateQuestions(questions, title, module, includeMeta, includeSolutio
       pageModel.startIdx,
       pageModel.title,
       pageModel.module,
-      pageModel.includeMeta,
       index + 1,
       totalPages
     );
@@ -200,7 +197,7 @@ function showPage(index) {
   pagination.style.display = total > 1 ? 'flex' : 'none';
 }
 
-function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum, totalPages) {
+function buildPageHTML(questions, startIdx, title, module, pageNum, totalPages) {
   const opSymbol = { addition: '+', subtraction: '−', multiplication: '×', division: '÷' };
 
   const cols = 2;
@@ -210,7 +207,7 @@ function buildPageHTML(questions, startIdx, title, module, includeMeta, pageNum,
   // Header
   html += `<div class="worksheet-header"><h2>${escapeHtml(title)}</h2>`;
   html += `<div class="worksheet-module">Module: ${escapeHtml(moduleLabel(module))}</div>`;
-  if (includeMeta && pageNum === 1) {
+  if (pageNum === 1) {
     html += `<div class="meta-fields">
       <span>Name: <span class="meta-field"></span></span>
       <span>Date: <span class="meta-field"></span></span>
