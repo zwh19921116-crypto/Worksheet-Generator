@@ -628,7 +628,7 @@ function renderSolutionHTML(question) {
     }
 
     if (question.kind === 'geometry') {
-      return `${renderGeometryPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
+      return `${escapeHtml(String(question.prompt ?? ''))} = ${escapeHtml(String(question.answer))}`;
     }
 
     if (question.kind === 'algebra') {
@@ -662,10 +662,7 @@ function buildQuestions(topic, min, max, count, timesTable) {
   const questions = [];
 
   if (GEOMETRY_TOPICS.has(topic)) {
-    for (let i = 0; i < count; i++) {
-      questions.push(buildGeometryQuestion(topic));
-    }
-    return questions;
+    return buildGeometryQuestions(topic, count);
   }
 
   if (ALGEBRA_TOPICS.has(topic)) {
@@ -973,38 +970,55 @@ function buildPercentageQuestion(topic) {
 function buildGeometryQuestion(topic) {
   switch (topic) {
     case '2d-shapes': {
-      const shapes2d = [
-        { name: 'Triangle', answer: '3 sides, 3 vertices' },
-        { name: 'Square', answer: '4 sides, 4 vertices' },
-        { name: 'Rectangle', answer: '4 sides, 4 vertices' },
-        { name: 'Pentagon', answer: '5 sides, 5 vertices' },
-        { name: 'Hexagon', answer: '6 sides, 6 vertices' },
-        { name: 'Octagon', answer: '8 sides, 8 vertices' },
-      ];
-      const shape = pickRandomFromList(shapes2d);
+      const shape = pickRandomFromList(get2dShapeFacts());
+      const promptType = pickRandomFromList(['sides', 'vertices', 'symmetry']);
+      if (promptType === 'sides') {
+        return {
+          kind: 'geometry',
+          topic,
+          prompt: `${shape.name}: number of sides`,
+          answer: shape.sides,
+        };
+      }
+      if (promptType === 'vertices') {
+        return {
+          kind: 'geometry',
+          topic,
+          prompt: `${shape.name}: number of vertices`,
+          answer: shape.vertices,
+        };
+      }
       return {
         kind: 'geometry',
         topic,
-        prompt: shape.name,
-        answer: shape.answer,
+        prompt: `${shape.name}: line(s) of symmetry`,
+        answer: shape.symmetry,
       };
     }
     case '3d-shapes': {
-      const shapes3d = [
-        { name: 'Cube', answer: '6 faces, 12 edges, 8 vertices' },
-        { name: 'Cuboid', answer: '6 faces, 12 edges, 8 vertices' },
-        { name: 'Triangular Prism', answer: '5 faces, 9 edges, 6 vertices' },
-        { name: 'Square Pyramid', answer: '5 faces, 8 edges, 5 vertices' },
-        { name: 'Cylinder', answer: '3 faces, 2 edges, 0 vertices' },
-        { name: 'Cone', answer: '2 faces, 1 edge, 1 vertex' },
-        { name: 'Sphere', answer: '1 curved face, 0 edges, 0 vertices' },
-      ];
-      const shape = pickRandomFromList(shapes3d);
+      const shape = pickRandomFromList(get3dShapeFacts());
+      const promptType = pickRandomFromList(['faces', 'edges', 'vertices']);
+      if (promptType === 'faces') {
+        return {
+          kind: 'geometry',
+          topic,
+          prompt: `${shape.name}: number of faces`,
+          answer: shape.faces,
+        };
+      }
+      if (promptType === 'edges') {
+        return {
+          kind: 'geometry',
+          topic,
+          prompt: `${shape.name}: number of edges`,
+          answer: shape.edges,
+        };
+      }
       return {
         kind: 'geometry',
         topic,
-        prompt: shape.name,
-        answer: shape.answer,
+        prompt: `${shape.name}: number of vertices`,
+        answer: shape.vertices,
       };
     }
     case 'angles': {
@@ -1113,6 +1127,70 @@ function buildGeometryQuestion(topic) {
         answer: '',
       };
   }
+}
+
+function buildGeometryQuestions(topic, count) {
+  if (topic !== '2d-shapes' && topic !== '3d-shapes') {
+    const items = [];
+    for (let i = 0; i < count; i++) {
+      items.push(buildGeometryQuestion(topic));
+    }
+    return items;
+  }
+
+  const source = topic === '2d-shapes' ? get2dShapeFacts() : get3dShapeFacts();
+  const promptTypes = topic === '2d-shapes' ? ['sides', 'vertices', 'symmetry'] : ['faces', 'edges', 'vertices'];
+  const shuffled = source.slice().sort(() => Math.random() - 0.5);
+  const items = [];
+
+  for (let i = 0; i < count; i++) {
+    const shape = shuffled[i % shuffled.length];
+    const promptType = promptTypes[i % promptTypes.length];
+
+    if (topic === '2d-shapes') {
+      if (promptType === 'sides') {
+        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of sides`, answer: shape.sides });
+      } else if (promptType === 'vertices') {
+        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of vertices`, answer: shape.vertices });
+      } else {
+        items.push({ kind: 'geometry', topic, prompt: `${shape.name}: line(s) of symmetry`, answer: shape.symmetry });
+      }
+      continue;
+    }
+
+    if (promptType === 'faces') {
+      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of faces`, answer: shape.faces });
+    } else if (promptType === 'edges') {
+      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of edges`, answer: shape.edges });
+    } else {
+      items.push({ kind: 'geometry', topic, prompt: `${shape.name}: number of vertices`, answer: shape.vertices });
+    }
+  }
+
+  return items;
+}
+
+function get2dShapeFacts() {
+  return [
+    { name: 'Triangle', sides: 3, vertices: 3, symmetry: 3 },
+    { name: 'Square', sides: 4, vertices: 4, symmetry: 4 },
+    { name: 'Rectangle', sides: 4, vertices: 4, symmetry: 2 },
+    { name: 'Pentagon', sides: 5, vertices: 5, symmetry: 5 },
+    { name: 'Hexagon', sides: 6, vertices: 6, symmetry: 6 },
+    { name: 'Octagon', sides: 8, vertices: 8, symmetry: 8 },
+  ];
+}
+
+function get3dShapeFacts() {
+  return [
+    { name: 'Cube', faces: 6, edges: 12, vertices: 8 },
+    { name: 'Cuboid', faces: 6, edges: 12, vertices: 8 },
+    { name: 'Triangular Prism', faces: 5, edges: 9, vertices: 6 },
+    { name: 'Square Pyramid', faces: 5, edges: 8, vertices: 5 },
+    { name: 'Cylinder', faces: 3, edges: 2, vertices: 0 },
+    { name: 'Cone', faces: 2, edges: 1, vertices: 1 },
+    { name: 'Sphere', faces: 1, edges: 0, vertices: 0 },
+  ];
 }
 
 function buildAlgebraQuestion(topic) {
@@ -1554,7 +1632,45 @@ function renderAlgebraPromptHTML(question) {
 }
 
 function renderGeometryPromptHTML(question) {
-  return escapeHtml(String(question.prompt ?? ''));
+  const rawPrompt = String(question.prompt ?? '');
+  const shapeName = rawPrompt.includes(':') ? rawPrompt.split(':')[0].trim() : rawPrompt;
+  const label = escapeHtml(rawPrompt);
+
+  if (question.topic !== '2d-shapes' && question.topic !== '3d-shapes') {
+    return label;
+  }
+
+  const shapeSvg = renderGeometryShapeSVG(shapeName, question.topic);
+  if (!shapeSvg) {
+    return label;
+  }
+
+  return `<span class="geometry-shape-with-label"><span class="geometry-shape-icon">${shapeSvg}</span><span class="geometry-shape-label">${label}</span></span>`;
+}
+
+function renderGeometryShapeSVG(shapeName, topic) {
+  if (topic === '2d-shapes') {
+    const shapeMap = {
+      Triangle: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,3 21,20 3,20" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      Square: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      Rectangle: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      Pentagon: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,3 21,10 18,20 6,20 3,10" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      Hexagon: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="7,3 17,3 22,12 17,21 7,21 2,12" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      Octagon: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="8,2 16,2 22,8 22,16 16,22 8,22 2,16 2,8" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    };
+    return shapeMap[shapeName] || '';
+  }
+
+  const shapeMap = {
+    Cube: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="8,4 16,4 21,8 13,8" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="3,8 11,8 11,20 3,20" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="11,8 21,8 21,20 11,20" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="4" x2="3" y2="8" stroke="currentColor" stroke-width="1.8"/><line x1="16" y1="4" x2="21" y2="8" stroke="currentColor" stroke-width="1.8"/></svg>',
+    Cuboid: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="7,5 17,5 21,8 11,8" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="3,8 13,8 13,20 3,20" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="13,8 21,8 21,20 13,20" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="7" y1="5" x2="3" y2="8" stroke="currentColor" stroke-width="1.8"/><line x1="17" y1="5" x2="21" y2="8" stroke="currentColor" stroke-width="1.8"/></svg>',
+    'Triangular Prism': '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="4,18 10,6 16,18" fill="none" stroke="currentColor" stroke-width="1.8"/><polygon points="8,18 14,6 20,18" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="18" x2="8" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="10" y1="6" x2="14" y2="6" stroke="currentColor" stroke-width="1.8"/><line x1="16" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="1.8"/></svg>',
+    'Square Pyramid': '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="4,18 20,18 16,21 8,21" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="4" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="20" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="16" y2="21" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="8" y2="21" stroke="currentColor" stroke-width="1.8"/></svg>',
+    Cylinder: '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="5" y1="6" x2="5" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="19" y1="6" x2="19" y2="18" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="18" rx="7" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+    Cone: '<svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="4" x2="4" y2="18" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="20" y2="18" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="18" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+    Sphere: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="12" rx="8" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.2"/><ellipse cx="12" cy="12" rx="3.5" ry="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+  };
+  return shapeMap[shapeName] || '';
 }
 
 function renderAlgebraTextHTML(text) {
@@ -1708,11 +1824,11 @@ function getPageInstruction(topic) {
   }
 
   if (topic === '2d-shapes') {
-    return 'Write the number of sides and vertices for each 2D shape:';
+    return 'Write the requested property for each 2D shape:';
   }
 
   if (topic === '3d-shapes') {
-    return 'Write the number of faces, edges and vertices for each 3D shape:';
+    return 'Write the requested property for each 3D shape:';
   }
 
   if (topic === 'angles') {
