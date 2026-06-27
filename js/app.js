@@ -1673,7 +1673,11 @@ function renderGeometryPromptHTML(question) {
     return label;
   }
 
-  return `<span class="geometry-shape-with-label"><span class="geometry-shape-icon">${shapeSvg}</span><span class="geometry-shape-label">${label}</span></span>`;
+  return `
+    <span class="geometry-shape-stack">
+      <span class="geometry-shape-question">${label}</span>
+      <span class="geometry-shape-icon" aria-hidden="true">${shapeSvg}</span>
+    </span>`;
 }
 
 function renderGeometryShapeSVG(shapeName, topic) {

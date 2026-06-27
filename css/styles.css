@@ -534,15 +534,20 @@ main {
   font-variant-numeric: tabular-nums;
 }
 
-.geometry-shape-with-label {
+.geometry-shape-stack {
   display: inline-flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 0.55rem;
 }
 
+.geometry-shape-question {
+  display: inline-block;
+}
+
 .geometry-shape-icon {
-  width: 2rem;
-  height: 2rem;
+  width: 3.2rem;
+  height: 3.2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -555,21 +560,17 @@ main {
   height: 100%;
 }
 
-.geometry-shape-label {
-  display: inline-block;
-}
-
-.geometry-topic-large-shape .geometry-shape-with-label {
-  gap: 0.75rem;
+.geometry-topic-large-shape .geometry-shape-stack {
+  gap: 0.7rem;
 }
 
 .geometry-topic-large-shape .geometry-shape-icon {
-  width: 2.8rem;
-  height: 2.8rem;
+  width: 4.8rem;
+  height: 4.8rem;
 }
 
-.geometry-topic-large-shape .geometry-shape-label {
-  font-size: 1.05rem;
+.geometry-topic-large-shape .geometry-shape-question {
+  font-size: 1rem;
 }
 
 .geometry-topic-answer-line {
