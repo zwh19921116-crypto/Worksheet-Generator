@@ -59,6 +59,18 @@ const MODULE_TOPICS = {
     { value: 'geometric-reasoning', label: 'Geometric Reasoning' },
     { value: 'proof', label: 'Proof' },
   ],
+  measurement: [
+    { value: 'length', label: 'Length' },
+    { value: 'area', label: 'Area' },
+    { value: 'perimeter', label: 'Perimeter' },
+    { value: 'volume', label: 'Volume' },
+    { value: 'surface-area', label: 'Surface Area' },
+    { value: 'capacity', label: 'Capacity' },
+    { value: 'mass', label: 'Mass' },
+    { value: 'time', label: 'Time' },
+    { value: 'unit-conversions', label: 'Unit Conversions' },
+    { value: 'scale-drawings', label: 'Scale Drawings' },
+  ],
   algebra: [
     { value: 'patterns', label: 'Patterns' },
     { value: 'variables', label: 'Variables' },
@@ -154,6 +166,19 @@ const ALGEBRA_TOPICS = new Set([
   'exponential-functions',
   'logarithmic-functions',
   'sequences',
+]);
+
+const MEASUREMENT_TOPICS = new Set([
+  'length',
+  'area',
+  'perimeter',
+  'volume',
+  'surface-area',
+  'capacity',
+  'mass',
+  'time',
+  'unit-conversions',
+  'scale-drawings',
 ]);
 
 let allPages    = [];
@@ -261,6 +286,7 @@ function moduleLabel(module) {
     decimals: 'Decimals',
     percentages: 'Percentages',
     geometry: 'Geometry',
+    measurement: 'Measurement',
     algebra: 'Algebra',
     number: 'Number',
   };
@@ -324,6 +350,16 @@ function topicLabel(topic, timesTable) {
     'exponential-functions': 'Exponential Functions Practice',
     'logarithmic-functions': 'Logarithmic Functions Practice',
     sequences: 'Sequences Practice',
+    length: 'Length Practice',
+    area: 'Area Practice',
+    perimeter: 'Perimeter Practice',
+    volume: 'Volume Practice',
+    'surface-area': 'Surface Area Practice',
+    capacity: 'Capacity Practice',
+    mass: 'Mass Practice',
+    time: 'Time Practice',
+    'unit-conversions': 'Unit Conversions Practice',
+    'scale-drawings': 'Scale Drawings Practice',
   };
   return map[topic] || 'Math Practice';
 }
@@ -543,6 +579,10 @@ function renderVerticalQuestion(num, question, symbol) {
     return renderDecimalQuestion(num, question);
   }
 
+  if (question.kind === 'measurement') {
+    return renderMeasurementQuestion(num, question);
+  }
+
   if (question.operation === 'bodmas') {
     return renderBodmasQuestion(num, question);
   }
@@ -626,6 +666,17 @@ function renderDecimalQuestion(num, question) {
     </div>`;
 }
 
+function renderMeasurementQuestion(num, question) {
+  return `
+    <div class="question question-number-topic">
+      <div class="question-number">${num}.</div>
+      <div class="number-topic-body">
+        <div class="number-topic-prompt">${escapeHtml(String(question.prompt ?? ''))}</div>
+        <div class="number-topic-answer-line"></div>
+      </div>
+    </div>`;
+}
+
 function renderSolutionHTML(question) {
   if (question.kind !== 'number') {
     if (question.kind === 'fraction') {
@@ -646,6 +697,10 @@ function renderSolutionHTML(question) {
 
     if (question.kind === 'decimal') {
       return `${renderDecimalSolutionText(question)} = ${escapeHtml(String(question.answer))}`;
+    }
+
+    if (question.kind === 'measurement') {
+      return `${escapeHtml(String(question.prompt ?? ''))} = ${escapeHtml(String(question.answer ?? ''))}`;
     }
 
     return escapeHtml(formatSolution(question));
@@ -673,6 +728,13 @@ function buildQuestions(topic, min, max, count, timesTable) {
   if (ALGEBRA_TOPICS.has(topic)) {
     for (let i = 0; i < count; i++) {
       questions.push(buildAlgebraQuestion(topic));
+    }
+    return questions;
+  }
+
+  if (MEASUREMENT_TOPICS.has(topic)) {
+    for (let i = 0; i < count; i++) {
+      questions.push(buildMeasurementQuestion(topic, min, max));
     }
     return questions;
   }
@@ -1138,6 +1200,139 @@ function buildGeometryQuestion(topic) {
     default:
       return {
         kind: 'geometry',
+        topic,
+        prompt: 'Write the answer.',
+        answer: '',
+      };
+  }
+}
+
+function buildMeasurementQuestion(topic, min, max) {
+  const safeMin = Math.max(1, min);
+  const safeMax = Math.max(safeMin + 1, max);
+
+  switch (topic) {
+    case 'length': {
+      const meters = randomInt(safeMin, Math.min(20, safeMax));
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Convert ${meters} m to cm`,
+        answer: `${meters * 100} cm`,
+      };
+    }
+    case 'area': {
+      const length = randomInt(2, 20);
+      const width = randomInt(2, 20);
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Rectangle ${length} cm by ${width} cm. Find the area`,
+        answer: `${length * width} cm²`,
+      };
+    }
+    case 'perimeter': {
+      const length = randomInt(2, 20);
+      const width = randomInt(2, 20);
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Rectangle ${length} cm by ${width} cm. Find the perimeter`,
+        answer: `${2 * (length + width)} cm`,
+      };
+    }
+    case 'volume': {
+      const l = randomInt(2, 12);
+      const w = randomInt(2, 12);
+      const h = randomInt(2, 12);
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Cuboid ${l} cm by ${w} cm by ${h} cm. Find the volume`,
+        answer: `${l * w * h} cm³`,
+      };
+    }
+    case 'surface-area': {
+      const side = randomInt(2, 20);
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Cube side length ${side} cm. Find the surface area`,
+        answer: `${6 * side * side} cm²`,
+      };
+    }
+    case 'capacity': {
+      const liters = randomInt(1, 25);
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Convert ${liters} L to mL`,
+        answer: `${liters * 1000} mL`,
+      };
+    }
+    case 'mass': {
+      const kg = randomInt(1, 30);
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Convert ${kg} kg to g`,
+        answer: `${kg * 1000} g`,
+      };
+    }
+    case 'time': {
+      const hours = randomInt(1, 6);
+      const minutes = randomInt(1, 11) * 5;
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Convert ${hours} h ${minutes} min to minutes`,
+        answer: `${hours * 60 + minutes} min`,
+      };
+    }
+    case 'unit-conversions': {
+      const conversionType = pickRandomFromList(['length', 'mass', 'capacity']);
+      if (conversionType === 'length') {
+        const cm = randomInt(100, 2500);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Convert ${cm} cm to m`,
+          answer: `${formatDecimalResult(cm / 100)} m`,
+        };
+      }
+
+      if (conversionType === 'mass') {
+        const grams = randomInt(200, 9000);
+        return {
+          kind: 'measurement',
+          topic,
+          prompt: `Convert ${grams} g to kg`,
+          answer: `${formatDecimalResult(grams / 1000)} kg`,
+        };
+      }
+
+      const ml = randomInt(250, 9500);
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Convert ${ml} mL to L`,
+        answer: `${formatDecimalResult(ml / 1000)} L`,
+      };
+    }
+    case 'scale-drawings': {
+      const scale = pickRandomFromList([20, 50, 100]);
+      const realMeters = randomInt(2, 20);
+      const drawingCm = (realMeters * 100) / scale;
+      return {
+        kind: 'measurement',
+        topic,
+        prompt: `Scale 1:${scale}. Real length ${realMeters} m. Find drawing length in cm`,
+        answer: `${formatDecimalResult(drawingCm)} cm`,
+      };
+    }
+    default:
+      return {
+        kind: 'measurement',
         topic,
         prompt: 'Write the answer.',
         answer: '',
@@ -1934,6 +2129,46 @@ function getPageInstruction(topic) {
 
   if (topic === 'proof') {
     return 'State whether each geometric statement is true or false:';
+  }
+
+  if (topic === 'length') {
+    return 'Convert each length to the requested unit:';
+  }
+
+  if (topic === 'area') {
+    return 'Find the area of each shape:';
+  }
+
+  if (topic === 'perimeter') {
+    return 'Find the perimeter of each shape:';
+  }
+
+  if (topic === 'volume') {
+    return 'Find the volume of each solid:';
+  }
+
+  if (topic === 'surface-area') {
+    return 'Find the surface area of each solid:';
+  }
+
+  if (topic === 'capacity') {
+    return 'Convert each capacity to the requested unit:';
+  }
+
+  if (topic === 'mass') {
+    return 'Convert each mass to the requested unit:';
+  }
+
+  if (topic === 'time') {
+    return 'Convert each time value to the requested unit:';
+  }
+
+  if (topic === 'unit-conversions') {
+    return 'Convert each value to the requested unit:';
+  }
+
+  if (topic === 'scale-drawings') {
+    return 'Use the scale to find the missing drawing length:';
   }
 
   if (ALGEBRA_TOPICS.has(topic)) {
