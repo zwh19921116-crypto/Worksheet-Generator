@@ -424,6 +424,10 @@ function renderSolutionHTML(question) {
     return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
   }
 
+  if (question.topic === 'scientific-notation') {
+    return `${renderNumberPromptHTML(question)} = ${renderScientificNotationHTML(String(question.answer))}`;
+  }
+
   return `${renderNumberPromptHTML(question)} = ${escapeHtml(String(question.answer))}`;
 }
 
@@ -792,6 +796,15 @@ function renderNumberPromptHTML(question) {
     default:
       return escapeHtml(question.prompt);
   }
+}
+
+function renderScientificNotationHTML(value) {
+  const match = String(value).match(/^(.+?) × 10\^(\d+)$/);
+  if (!match) {
+    return escapeHtml(String(value));
+  }
+
+  return `${escapeHtml(match[1])} × 10<sup>${escapeHtml(match[2])}</sup>`;
 }
 
 function isYesNoNumberQuestion(question) {
